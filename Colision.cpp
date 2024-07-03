@@ -7,7 +7,8 @@ void Colision::verificarColisionHitbox(Gato* gato, std::vector<Enemigo*>& enemig
             // Colision por arriba-abajo
             if (
                 enemigos[i]->getPosX() + enemigos[i]->getAltoHitbox() + 1.0f > gato->getPosX() &&
-                enemigos[i]->getPosX() < gato->getPosX()  + gato->getAnchoHitbox() + 1.0f
+                enemigos[i]->getPosX() < gato->getPosX()  + gato->getAnchoHitbox() + 1.0f && 
+				enemigos[i]->getPosY() >= gato->getPosY() + gato->getAltoHitbox()
                 ) {
                 enemigos[i]->colisionLados = false;
             }

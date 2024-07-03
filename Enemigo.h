@@ -7,7 +7,7 @@
 #include "Definitions.hpp"
 
 class Enemigo {
-private:
+protected:
 
     sf::RectangleShape hitBox;
 
@@ -70,7 +70,7 @@ public:
 
     void detectarObjIzqDer(const std::vector<std::vector<int>>&);
 
-    void update(float, const std::vector<std::vector<int>>&);
+    virtual void update(float, const std::vector<std::vector<int>>&);
 
     void drawTo(sf::RenderWindow&);
 

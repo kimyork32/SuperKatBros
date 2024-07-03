@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Gato.h"
 #include "Enemigo.h"
+#include "Pepino.h"
+#include "Erizo.h"
 #include "Colision.h"
 #include "Mapa.h"
 #include "Definitions.hpp"
@@ -14,7 +16,7 @@
 class Game {
 public:
     Game() : window(sf::VideoMode(windowSize, windowSize), "Mapa y Personaje"),
-        view(sf::FloatRect(0, 0, windowSize/3*2, windowSize/3*2)),
+        //view(sf::FloatRect(0, 0, windowSize/3*2, windowSize/3*2)),
         colision(),
         mapa("map.txt", "mapaSplit.png")
     {
@@ -108,8 +110,18 @@ private:
             for (int j = 0; j < numCols; j++) {
                 if (mapa.getValMap(i, j) == 50) { 
 					std::cout << "Enemigo en " << i << " " << j << std::endl;
-                    enemigos.push_back(new Enemigo(j * cellSize, i * cellSize));
+                    enemigos.push_back(new Pepino(j * cellSize, i * cellSize));
                     mapa.setValMap(i, j, 0); 
+                }
+                else if (mapa.getValMap(i, j) == 51) {
+                    std::cout << "Enemigo en " << i << " " << j << std::endl;
+                    enemigos.push_back(new Erizo(j * cellSize, i * cellSize));
+                    mapa.setValMap(i, j, 0);
+                }
+                else if (mapa.getValMap(i, j) == 52) {
+                    std::cout << "Enemigo en " << i << " " << j << std::endl;
+                    enemigos.push_back(new Enemigo(j * cellSize, i * cellSize));
+                    mapa.setValMap(i, j, 0);
                 }
             }
         }

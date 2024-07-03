@@ -49,6 +49,8 @@ void Gato::saltar() {
         velocidadY = JUMP_FORCE / MASS;
         jumpTime = 0.0f;
     }
+    jumpTime += deltaTime;
+    velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;  
 }
 
 void Gato::controlarSalto() {
@@ -56,8 +58,7 @@ void Gato::controlarSalto() {
 
     if (jumpButtonPressed) {
         saltar();
-        jumpTime += deltaTime;
-        velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;
+        
     }
 }
 
