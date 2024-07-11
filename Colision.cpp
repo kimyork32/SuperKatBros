@@ -1,37 +1,35 @@
 #include "Colision.h"
 
-void Colision::verificarColisionHitbox(Gato* gato, std::vector<Enemigo*>& enemigos) {
-    for (size_t i = 0; i < enemigos.size(); i++) {
-        if(!enemigos[i]->getHitBox().getGlobalBounds().intersects(gato->getHitBox().getGlobalBounds())) {
-    
-            // Colision por arriba-abajo
-            if (
-                enemigos[i]->getPosX() + enemigos[i]->getAltoHitbox() + 1.0f > gato->getPosX() &&
-                enemigos[i]->getPosX() < gato->getPosX()  + gato->getAnchoHitbox() + 1.0f && 
-				enemigos[i]->getPosY() >= gato->getPosY() + gato->getAltoHitbox()
-                ) {
+// colision con enemigos
+void Colision::verificarColisionHitboxEnemigo(Gato* gato, std::vector<std::unique_ptr<Enemigo>>& enemigos) {
+    for (size_t i = 0; i < enemigos.size(); /* no incrementar i aquí */) {
+        if (!enemigos[i]->getHitBox().getGlobalBounds().intersects(gato->getHitBox().getGlobalBounds())) {
+
+            // Colision por arriba
+            if (enemigos[i]->getPosX() + enemigos[i]->getAltoHitbox() + 1.0f > gato->getPosX() &&
+                enemigos[i]->getPosX() < gato->getPosX() + gato->getAnchoHitbox() + 1.0f &&
+                enemigos[i]->getPosY() >= gato->getPosY() + gato->getAltoHitbox()) {
                 enemigos[i]->colisionLados = false;
             }
 
             // Colision por los lados
-            if (
-                enemigos[i]->getPosY() < gato->getPosY() + gato->getAltoHitbox() + 1.0f &&
-                enemigos[i]->getPosY() + enemigos[i]->getAltoHitbox() + 1.0f > gato->getPosY()
-                ) {
+            if (enemigos[i]->getPosY() < gato->getPosY() + gato->getAltoHitbox() + 1.0f &&
+                enemigos[i]->getPosY() + enemigos[i]->getAltoHitbox() + 1.0f > gato->getPosY()) {
                 enemigos[i]->colisionLados = true;
-            }            
+            }
+
+            // Incrementar i solo si no se elimina el elemento en este ciclo
+            ++i;
         }
         else {
-		
-		    if (enemigos[i]->colisionLados) { // player colisiona en los lados -> player muere
-                //gato->parar();
-				gato->morir();  
+            if (enemigos[i]->colisionLados) { // player colisiona en los lados del enemigo -> player muere
+                gato->morir();
             }
-		    else { // player colisiona arriba o abajo -> enemigo muere
-                //enemigos[i]->parar();
-                delete enemigos[i];
-				enemigos.erase(enemigos.begin() + i);
+            else { // player colisiona por arriba del enemigo -> enemigo muere
+                enemigos.erase(enemigos.begin() + i);
             }
+            // No incrementar i aquí, ya que se ajusta automáticamente al borrar elementos del vector
         }
     }
 }
+

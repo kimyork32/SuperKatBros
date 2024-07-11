@@ -1,3 +1,8 @@
+#ifndef MAPA_H
+#define MAPA_H
+
+
+
 #include <SFML/Graphics.hpp>
 #include <fstream>
 #include <sstream>
@@ -31,3 +36,5 @@ public:
 	int getValMap(int, int) const;
     
 };
+
+#endif // !MAPA_H

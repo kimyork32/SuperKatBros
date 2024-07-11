@@ -1,6 +1,7 @@
-#include "Enemigo.h"
 
-Enemigo::Enemigo(float x, float y) {
+#include "Item.h"
+
+Item::Item(float x, float y) {
     hitBox.setPosition(x, y);
     hitBox.setSize(sf::Vector2f(anchoHitbox, altoHitbox));
     hitBox.setFillColor(sf::Color::Red);
@@ -17,41 +18,25 @@ Enemigo::Enemigo(float x, float y) {
 
     deltaTime = 0;
     jumpTime = 0.0f;
-    //loadSpriteSheet("sprite.png");
+    loadSpriteSheet("sprite.png");
 }
 
-Enemigo::~Enemigo() {
-    std::cout << "enemigo muerto" << std::endl;
+Item::~Item() {
+    std::cout << "Item muerto" << std::endl;
 }
 
-//void Enemigo::saltar() {
-//    if (hitBox.getPosition().y + 1 >= PISO - altoHitbox) {
-//        velocidadY = JUMP_FORCE / MASS;
-//        jumpTime = 0.0f;
-//    }
-//}
 
-//void Enemigo::controlarSalto() {
-//    this->jumpButtonPressed = static_cast<bool>(spacePressed && clock2.getElapsedTime().asMilliseconds() < 800 && !teclaSuelta);
-//
-//    if (jumpButtonPressed) {
-//        saltar();
-//        jumpTime += deltaTime;
-//        velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;
-//    }
-//}
-
-void Enemigo::applyGravity() {
+void Item::applyGravity() {
     velocidadY += GRAVITY * deltaTime;
 }
 
 
-void Enemigo::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
+void Item::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
     if ((hitBox.getPosition().y >= 0 && hitBox.getPosition().y + altoHitbox < numRows * cellSize) &&
         (hitBox.getPosition().x >= 0 && hitBox.getPosition().x + altoHitbox < numCols * cellSize)) {
         for (int i = hitBox.getPosition().y / cellSize; i < numRows; i++) {
             if ((map[i][hitBox.getPosition().x / cellSize] >= rangeBloqueBegin || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
-                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEnd+3 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEnd+3)) {
+                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEnd + 3 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEnd + 3)) {
                 PISO = i * cellSize;
                 break;
             }
@@ -62,7 +47,7 @@ void Enemigo::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
 
         for (int i = hitBox.getPosition().y / cellSize; i >= 0; i--) {
             if ((map[i][hitBox.getPosition().x / cellSize] >= rangeBloqueBegin || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
-                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEnd+3 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEnd+3)) {
+                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEnd + 3 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEnd + 3)) {
                 TECHO = (i + 1) * cellSize;
                 break;
             }
@@ -73,14 +58,14 @@ void Enemigo::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
     }
 }
 
-void Enemigo::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
+void Item::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
     if ((hitBox.getPosition().y >= 0 && hitBox.getPosition().y + altoHitbox < numRows * cellSize) &&
         (hitBox.getPosition().x >= 0 && hitBox.getPosition().x + anchoHitbox < numCols * cellSize)) {
 
         // Detección a la derecha
         for (int i = hitBox.getPosition().x / cellSize; i < numCols; i++) {
-            if ((map[hitBox.getPosition().y / cellSize][i] >= rangeBloqueBegin || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] >= rangeBloqueBegin)&&
-                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEnd+3 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEnd+3)) {
+            if ((map[hitBox.getPosition().y / cellSize][i] >= rangeBloqueBegin || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] >= rangeBloqueBegin) &&
+                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEnd + 3 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEnd + 3)) {
                 OBJDER = i * cellSize;
                 break;
             }
@@ -92,7 +77,7 @@ void Enemigo::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
         // Detección a la izquierda
         for (int i = hitBox.getPosition().x / cellSize; i >= 0; i--) {
             if ((map[hitBox.getPosition().y / cellSize][i] >= rangeBloqueBegin || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] >= rangeBloqueBegin) &&
-                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEnd+3 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEnd+3)) {
+                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEnd + 3 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEnd + 3)) {
                 OBJIZQ = (i + 1) * cellSize;
                 break;
             }
@@ -104,7 +89,7 @@ void Enemigo::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
 }
 
 
-void Enemigo::controlarMovimientoVertical(const std::vector<std::vector<int>>& map) {
+void Item::controlarMovimientoVertical(const std::vector<std::vector<int>>& map) {
     float nextMove = hitBox.getPosition().y + velocidadY * deltaTime;
 
     if (nextMove < TECHO) {
@@ -123,7 +108,7 @@ void Enemigo::controlarMovimientoVertical(const std::vector<std::vector<int>>& m
 }
 
 
-void Enemigo::controlarMovimientoHorizontal(float deltaTime, const std::vector<std::vector<int>>& map) {
+void Item::controlarMovimientoHorizontal(float deltaTime, const std::vector<std::vector<int>>& map) {
 
     float proxMovimientoX = 0.0f;
 
@@ -139,7 +124,7 @@ void Enemigo::controlarMovimientoHorizontal(float deltaTime, const std::vector<s
 
         if (hitBox.getPosition().x + anchoHitbox + proxMovimientoX > OBJDER) {
             proxMovimientoX = OBJDER - hitBox.getPosition().x - anchoHitbox - 1.0f;
-            rebote = !rebote; 
+            rebote = !rebote;
         }
 
         else if (hitBox.getPosition().x + proxMovimientoX < OBJIZQ) {
@@ -155,85 +140,85 @@ void Enemigo::controlarMovimientoHorizontal(float deltaTime, const std::vector<s
 }
 
 
-void Enemigo::drawTo(sf::RenderWindow& window) {
+void Item::drawTo(sf::RenderWindow& window) {
     window.draw(hitBox);
-    window.draw(spriteGato);
+    window.draw(spriteItem);
 }
 
-sf::Vector2f Enemigo::getPosition() const {
+sf::Vector2f Item::getPosition() const {
     return hitBox.getPosition();
 }
 
-void Enemigo::loadSpriteSheet(const std::string& filename) {
-    if (!texturaGato.loadFromFile(filename)) {
+void Item::loadSpriteSheet(const std::string& filename) {
+    if (!texturaItem.loadFromFile(filename)) {
         std::cerr << "Error cargando la textura" << std::endl;
         return;
     }
-    spriteGato.setTexture(texturaGato);
-    spriteGato.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
-    spriteGato.setScale(escalaX, escalaY);
+    spriteItem.setTexture(texturaItem);
+    spriteItem.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+    spriteItem.setScale(escalaX, escalaY);
 }
 
-void Enemigo::moverHorizontalSprite(bool left, bool right) {
+void Item::moverHorizontalSprite(bool left, bool right) {
     if (!stop) {
         if (rebote) {
-            yTexture = (int(spriteGato.getPosition().x) / velocidadSprite) % 3 * altoSprite;
-            spriteGato.setTextureRect(sf::IntRect(anchoSprite, yTexture, anchoSprite, altoSprite));
+            yTexture = (int(spriteItem.getPosition().x) / velocidadSprite) % 3 * altoSprite;
+            spriteItem.setTextureRect(sf::IntRect(anchoSprite, yTexture, anchoSprite, altoSprite));
         }
         if (!rebote) {
-            yTexture = (int(spriteGato.getPosition().x) / velocidadSprite) % 3 * altoSprite;
-            spriteGato.setTextureRect(sf::IntRect(anchoSprite * 3, yTexture, anchoSprite, altoSprite));
+            yTexture = (int(spriteItem.getPosition().x) / velocidadSprite) % 3 * altoSprite;
+            spriteItem.setTextureRect(sf::IntRect(anchoSprite * 3, yTexture, anchoSprite, altoSprite));
         }
     }
     else {
-        spriteGato.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+        spriteItem.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
     }
-    
-    spriteGato.setPosition(hitBox.getPosition().x - ((anchoSprite * escalaX - anchoHitbox) / 2), hitBox.getPosition().y - ((altoSprite * escalaY - altoHitbox) / 2));
+
+    spriteItem.setPosition(hitBox.getPosition().x - ((anchoSprite * escalaX - anchoHitbox) / 2), hitBox.getPosition().y - ((altoSprite * escalaY - altoHitbox) / 2));
 
 }
 
 
-void Enemigo::update(float deltaTime, const std::vector<std::vector<int>>& map) {
+void Item::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     this->deltaTime = deltaTime;
 
     detectarObjIzqDer(map);
     detectarPisoTecho(map);
 
-    //controlarSalto();
     applyGravity();
 
     controlarMovimientoHorizontal(deltaTime, map);
-    controlarMovimientoVertical(map);
+    //controlarMovimientoVertical(map);
     moverHorizontalSprite(left, right);
 }
 
 
-sf::RectangleShape Enemigo::getHitBox() {
-	return hitBox;
+sf::RectangleShape Item::getHitBox() {
+    return hitBox;
 }
 
-float Enemigo::getAnchoHitbox() {
-	return anchoHitbox;
+float Item::getAnchoHitbox() {
+    return anchoHitbox;
 }
 
-float Enemigo::getAltoHitbox() {
-	return altoHitbox;
+float Item::getAltoHitbox() {
+    return altoHitbox;
 }
 
-float Enemigo::getPosX() {
+float Item::getPosX() {
     return hitBox.getPosition().x;
 }
 
-float Enemigo::getPosY() {
+float Item::getPosY() {
     return hitBox.getPosition().y;
 }
 
-//void Enemigo::setVelocidadX(float velocidadX) {
+//void Item::setVelocidadX(float velocidadX) {
 //    this->velocidadX = velocidadX;
 //}
 
-void Enemigo::parar() {
+void Item::parar() {
     this->stop = true;
 }
+
 

@@ -1,15 +1,15 @@
-#ifndef PEPINO_H
-#define PEPINO_H
+#ifndef SERPIENTE_H
+#define SERPIENTE_H
 
 #include "Enemigo.h"
 
-class Pepino : public Enemigo {
+class Serpiente : public Enemigo {
 public:
-    Pepino(float x, float y);
+    Serpiente(float x, float y);
     void update(float deltaTime, const std::vector<std::vector<int>>& map) override;
 
 private:
     void saltar();
 };
 
-#endif // PEPINO_H
+#endif // SERPIENTE_H

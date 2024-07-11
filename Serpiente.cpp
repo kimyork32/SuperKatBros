@@ -1,9 +1,9 @@
-#include "Pepino.h"
+#include "Serpiente.h"
 
-Pepino::Pepino(float x, float y) : Enemigo(x, y) {
+Serpiente::Serpiente(float x, float y) : Enemigo(x, y) {
 }
 
-void Pepino::saltar() {
+void Serpiente::saltar() {
     if (getPosY() + 1 >= PISO - getAltoHitbox()) {
         velocidadY = JUMP_FORCE / MASS;
         jumpTime = 0.0f;
@@ -12,7 +12,7 @@ void Pepino::saltar() {
     velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;
 }
 
-void Pepino::update(float deltaTime, const std::vector<std::vector<int>>& map) {
+void Serpiente::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     this->deltaTime = deltaTime;
 
     detectarObjIzqDer(map);

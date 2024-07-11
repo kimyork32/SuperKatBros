@@ -1,4 +1,5 @@
 #include "Mapa.h"
+#include "Definitions.hpp"
 
 Mapa::Mapa(const std::string& filename, const std::string& spriteSheet) {
     loadMap(filename);

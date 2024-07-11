@@ -3,6 +3,8 @@
 Erizo::Erizo(float x, float y) : Enemigo(x, y), speedBoostActive(false) {
     // Inicializa el reloj para el aumento de velocidad
     speedClock.restart();
+    loadSpriteSheet("sprite.png");
+
 }
 
 void Erizo::aumentarVelocidad() {

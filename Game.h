@@ -3,27 +3,31 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include <memory> 
+
 #include "Gato.h"
 #include "Enemigo.h"
-#include "Pepino.h"
+#include "Serpiente.h"
 #include "Erizo.h"
 #include "Colision.h"
 #include "Mapa.h"
 #include "Definitions.hpp"
-
-
+#include "Bloque.h"
+#include "BloqueDestruible.h"
+#include "BloqueItem.h"
+#include "BloqueMoneda.h"
+#include "Item.h"
 
 class Game {
 public:
-    Game() : window(sf::VideoMode(windowSize, windowSize), "Mapa y Personaje"),
-        //view(sf::FloatRect(0, 0, windowSize/3*2, windowSize/3*2)),
+    Game()
+        : window(sf::VideoMode(windowSize, windowSize), "Mapa y Personaje"),
         colision(),
         mapa("map.txt", "mapaSplit.png")
     {
-        player = new Gato(2 * cellSize, 2 * cellSize);
-        //enemigo1 = new Enemigo(3 * cellSize, 2 * cellSize);
+        gato = std::make_unique<Gato>(2 * cellSize, 2 * cellSize);
         crearEnemigos();
-        
+        crearBloques();
         window.setView(view);
     }
 
@@ -38,22 +42,21 @@ public:
 private:
     sf::RenderWindow window;
     sf::View view;
-	Colision colision;
-    Gato* player;
-	std::vector<Enemigo*> enemigos;
+    Colision colision;
+    std::unique_ptr<Gato> gato;
+    std::vector<std::unique_ptr<Enemigo>> enemigos;
+    std::vector<std::unique_ptr<Bloque>> bloques;
+   
     Mapa mapa;
     bool colisionLados = false;
-
     sf::Clock clock;
-
 
     void handleEvents() {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-            player->processEvents(event);
-            
+            gato->processEvents(event);
         }
     }
 
@@ -63,29 +66,28 @@ private:
             sf::sleep(sf::milliseconds(16 - elapsed.asMilliseconds()));
         }
         float deltaTime = clock.restart().asSeconds();
-
+        
         // update gato
-        player->update(deltaTime, mapa.getMap());
+        gato->update(deltaTime, mapa.getMap());
 
         // update enemigos
-        for (int i = 0; i < enemigos.size(); i++) {
-            enemigos[i]->update(deltaTime, mapa.getMap());
+        for (auto& enemigo : enemigos) {
+            enemigo->update(deltaTime, mapa.getMap());
         }
-        
-        //verificar colision enemigos-gato
-        colision.verificarColisionHitbox(player, enemigos);
-        /*for (size_t i = 0; i < enemigos.size(); i++) {
-            colision.verificarColisionHitbox(player, enemigos[i], i);
-            if (!i % 2) {
-                std::cout << std::endl;
-            }
-        }*/
 
+        //verificar colision gato-enemigos
+        colision.verificarColisionHitboxEnemigo(gato.get(), enemigos);
+        //veriEne();
+
+        //verificar colision gato-bloque
+        verificarColisionGatoBloque();
+
+        
         // Centrar la vista en el personaje
-        view.setCenter(player->getPosition().x + cellSize, player->getPosition().y + cellSize);
+        view.setCenter(gato->getPosition().x + cellSize/2, gato->getPosition().y + cellSize/2);
         window.setView(view);
     }
-        
+
     void render() {
         window.clear(sf::Color(0, 191, 255));
 
@@ -93,14 +95,17 @@ private:
         mapa.draw(window);
 
         // Dibujar el personaje
-        player->drawTo(window);
+        gato->drawTo(window);
 
         // Dibujar enemigo
-        for (int i = 0; i < enemigos.size(); i++) {
-            enemigos[i]->drawTo(window);
+        for (auto& enemigo : enemigos) {
+            enemigo->drawTo(window);
         }
-		
 
+        // Dibujar bloques
+        for (auto& bloque : bloques) {
+            bloque->drawTo(window);
+        }
 
         window.display();
     }
@@ -108,24 +113,57 @@ private:
     void crearEnemigos() {
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
-                if (mapa.getValMap(i, j) == 50) { 
-					std::cout << "Enemigo en " << i << " " << j << std::endl;
-                    enemigos.push_back(new Pepino(j * cellSize, i * cellSize));
-                    mapa.setValMap(i, j, 0); 
-                }
-                else if (mapa.getValMap(i, j) == 51) {
+                if (mapa.getValMap(i, j) == 57) {
                     std::cout << "Enemigo en " << i << " " << j << std::endl;
-                    enemigos.push_back(new Erizo(j * cellSize, i * cellSize));
+                    enemigos.push_back(std::make_unique<Enemigo>(j * cellSize, i * cellSize));
                     mapa.setValMap(i, j, 0);
                 }
-                else if (mapa.getValMap(i, j) == 52) {
+                else if (mapa.getValMap(i, j) == 58) {
                     std::cout << "Enemigo en " << i << " " << j << std::endl;
-                    enemigos.push_back(new Enemigo(j * cellSize, i * cellSize));
+                    enemigos.push_back(std::make_unique<Erizo>(j * cellSize, i * cellSize));
+                    mapa.setValMap(i, j, 0);
+                }
+                else if (mapa.getValMap(i, j) == 59) {
+                    std::cout << "Enemigo en " << i << " " << j << std::endl;
+                    enemigos.push_back(std::make_unique<Serpiente>(j * cellSize, i * cellSize));
                     mapa.setValMap(i, j, 0);
                 }
             }
         }
     }
 
+    void crearBloques() {
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                if (mapa.getValMap(i, j) == 50) {
+                    std::cout << "Bloque en " << i << " " << j << std::endl;
+                    bloques.push_back(std::make_unique<BloqueDestruible>(j * cellSize, i * cellSize));
+                    gato->addObserver(bloques.back().get());
+                }
+                else if (mapa.getValMap(i, j) == 51) {
+                    std::cout << "Bloque en " << i << " " << j << std::endl;
+                    bloques.push_back(std::make_unique<BloqueMoneda>(j * cellSize, i * cellSize));
+                    gato->addObserver(bloques.back().get());
+                }
+                else if (mapa.getValMap(i, j) == 52) {
+                    std::cout << "Bloque en " << i << " " << j << std::endl;
+                    bloques.push_back(std::make_unique<BloqueItem>(j * cellSize, i * cellSize));
+                    gato->addObserver(bloques.back().get());
+                }
+            }
+        }
+    }
+
+    void verificarColisionGatoBloque() {
+        for (size_t i = 0; i < bloques.size(); /* no incrementar i aquí */) {
+            if (bloques[i]->verificarColision()) {
+                mapa.setValMap(bloques[i]->getPosY() / cellSize, bloques[i]->getPosX() / cellSize, 0);
+                bloques.erase(bloques.begin() + i);
+                gato->deleteObserver(i);
+            }
+            ++i;
+        }
+        //std::cout << bloques.size() << std::endl;
+    }
     
 };

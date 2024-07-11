@@ -1,4 +1,4 @@
-#include "Gato.h"
+ #include "Gato.h"
 
 Gato::Gato(float x, float y) {
     hitBox.setPosition(x, y);
@@ -45,7 +45,7 @@ void Gato::processEvents(const sf::Event& event) {
 }
 
 void Gato::saltar() {
-    if (hitBox.getPosition().y + 1 >= PISO - altoHitbox) {
+    if (hitBox.getPosition().y + 1 >= PISO.y - altoHitbox) {
         velocidadY = JUMP_FORCE / MASS;
         jumpTime = 0.0f;
     }
@@ -74,21 +74,24 @@ void Gato::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
         (hitBox.getPosition().x >= 0 && hitBox.getPosition().x + altoHitbox < numCols * cellSize)) {
         for (int i = hitBox.getPosition().y / cellSize; i < numRows; i++) {
             if (map[i][hitBox.getPosition().x / cellSize] != 0 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] != 0) {
-                PISO = i * cellSize;
+                PISO.y = i * cellSize;
+
+                PISO.x = hitBox.getPosition().x + anchoHitbox / 2;
                 break;
             }
             else {
-                PISO = 400.0f;
+                PISO.y = 400.0f;
             }
         }
 
         for (int i = hitBox.getPosition().y / cellSize; i >= 0; i--) {
             if (map[i][hitBox.getPosition().x / cellSize] != 0 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] != 0){
-                TECHO = (i + 1) * cellSize;
+                TECHO.y = (i + 1) * cellSize;
+                TECHO.x = hitBox.getPosition().x + anchoHitbox / 2;
                 break;
             }
             else {
-                TECHO = -1000.0f;
+                TECHO.y = -1000.0f;
             }
         }
     }
@@ -101,22 +104,24 @@ void Gato::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
         // Detección a la derecha
         for (int i = hitBox.getPosition().x / cellSize; i < numCols; i++) {
             if (map[hitBox.getPosition().y / cellSize][i] != 0 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] != 0) {
-                OBJDER = i * cellSize;
+                OBJDER.x = i * cellSize;
+				OBJDER.y = hitBox.getPosition().y + altoHitbox / 2;
                 break;
             }
             else {
-                OBJDER = numCols * cellSize;
+                OBJDER.x = numCols * cellSize;
             }
         }
 
         // Detección a la izquierda
         for (int i = hitBox.getPosition().x / cellSize; i >= 0; i--) {
             if (map[hitBox.getPosition().y / cellSize][i] != 0 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] != 0) {
-                OBJIZQ = (i + 1) * cellSize;
+                OBJIZQ.x = (i + 1) * cellSize;
+				OBJIZQ.y = hitBox.getPosition().y + altoHitbox / 2;
                 break;
             }
             else {
-                OBJIZQ = 0;
+                OBJIZQ.x = 0;
             }
         }
     }
@@ -125,20 +130,20 @@ void Gato::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
 
 void Gato::controlarMovimientoVertical(const std::vector<std::vector<int>>& map) {
     float nextMove = hitBox.getPosition().y + velocidadY * deltaTime;
-
-    if (nextMove < TECHO) {
-        nextMove = TECHO;
+    if (nextMove < TECHO.y) {
+        collideWithBlock(static_cast<int>(TECHO.x / cellSize), static_cast<int>(TECHO.y / cellSize) - 1.0f);
+        nextMove = TECHO.y;
         velocidadY = 0;
         teclaSuelta = true;
     }
 
     hitBox.move(0.f, nextMove - hitBox.getPosition().y);
 
-    if (hitBox.getPosition().y + altoHitbox > PISO) {
-        hitBox.setPosition(hitBox.getPosition().x, PISO - altoHitbox - 1.0f);
+    if (hitBox.getPosition().y + altoHitbox > PISO.y) {
+        //collideWithBlock(static_cast<int>(PISO.x / cellSize), static_cast<int>(PISO.y / cellSize));
+        hitBox.setPosition(hitBox.getPosition().x, PISO.y - altoHitbox - 1.0f);
         velocidadY = 0.0f;
     }
-
 }
 
 
@@ -146,21 +151,24 @@ void Gato::controlarMovimientoHorizontal(float deltaTime, const std::vector<std:
     
     float proxMovimientoX = 0.0f;
 
-    if (!stop) {
-        if (left)
-            proxMovimientoX -= velocidadX * deltaTime;
-        if (right)
-            proxMovimientoX += velocidadX * deltaTime;
+    if (left && !stopIzq) {
+
+        proxMovimientoX -= velocidadX * deltaTime;
+    }
+    if (right && !stopDer) {
+        proxMovimientoX += velocidadX * deltaTime;
     }
     
     if (proxMovimientoX != 0) {
 		
-        if (hitBox.getPosition().x + anchoHitbox + proxMovimientoX > OBJDER) {
-            proxMovimientoX = OBJDER - hitBox.getPosition().x - anchoHitbox - 1.0f;
+        if (hitBox.getPosition().x + anchoHitbox + proxMovimientoX > OBJDER.x) {
+			//collideWithBlock(static_cast<int>(OBJDER.x / cellSize), static_cast<int>(OBJDER.y / cellSize));
+			proxMovimientoX = OBJDER.x - hitBox.getPosition().x - anchoHitbox - 1.0f;
         }
        
-        else if (hitBox.getPosition().x + proxMovimientoX < OBJIZQ) {
-            proxMovimientoX = OBJIZQ - hitBox.getPosition().x + 1.0f;
+        else if (hitBox.getPosition().x + proxMovimientoX < OBJIZQ.x) {
+            //collideWithBlock(static_cast<int>(OBJIZQ.x / cellSize) - 1.0f, static_cast<int>(OBJIZQ.y / }cellSize));
+            proxMovimientoX = OBJIZQ.x - hitBox.getPosition().x + 1.0f;
         }
         else {
             hitBox.move(proxMovimientoX, 0.f);
@@ -203,7 +211,6 @@ void Gato::moverHorizontalSprite(bool left, bool right) {
         spriteGato.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
     }
     spriteGato.setPosition(hitBox.getPosition().x - ((anchoSprite * escalaX - anchoHitbox) / 2), hitBox.getPosition().y - ((altoSprite * escalaY - altoHitbox) / 2));
-
 }
 
 
@@ -241,15 +248,21 @@ float Gato::getPosY() {
 	return hitBox.getPosition().y;
 }
 
-//void Gato::setVelocidadX(float velocidadX) {
-//	this->velocidadX = velocidadX;
-//}
 
-void Gato::parar() {
-    this->stop = true;
+void Gato::pararMovimientoXDer(float esquinaIzqObj) {
+	hitBox.move(esquinaIzqObj - hitBox.getPosition().x - anchoHitbox - 1.0f, 0);
+    spriteGato.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+}
+
+void Gato::seguirMovimientoXDer() {
+	this->stopDer = false;
 }
 
 
 void Gato::morir() {
-    hitBox.setPosition(2*cellSize, 2 * cellSize);
+    hitBox.setPosition(2 * cellSize, 2 * cellSize);
+}
+
+void Gato::collideWithBlock(int i, int j) {
+    notify(i, j);
 }
