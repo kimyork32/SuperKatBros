@@ -4,8 +4,11 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+#include <memory>
+
 #include "Definitions.hpp"
 #include "SubjectColision.h"
+#include "Bala.h"
 
 
 
@@ -21,22 +24,26 @@ private:
     const float anchoSprite = 25.0f;   // 100.0f x 4    s a w d
     const float altoSprite = 39.0f;    // 195.0f x 5
 
-    const float anchoHitbox = 80.0f;
+    const float anchoHitbox = 50.0f;
     const float altoHitbox = 60.0f;  
 
-	const float excesoSprite = 0.0f;
+	const float excesoSprite = 1.0f;
     const float escalaX = anchoHitbox / anchoSprite + excesoSprite;
     const float escalaY = altoHitbox / altoSprite + excesoSprite;
     
-    float velocidadX;
-    float velocidadY;
+    /*velocidadX;
+    float velocidadY;*/
+    float velocidadX = 370.0f;
+    float velocidadY = 0.0f;
 
-    const int velocidadSprite = 100; // a menor es el valor -> mas rapido es el sprite
+    const int velocidadSprite = 120; // a menor es el valor -> mas rapido es el sprite
 
     bool jumping = false;
     
     bool left;
     bool right;
+
+    unsigned int monedas;
 
     bool stopDer = false;
     bool stopIzq = false;
@@ -46,10 +53,9 @@ private:
 
     bool jumpButtonPressed;
 
-    /*float TECHO;
-    float PISO;
-    float OBJDER;
-	float OBJIZQ;*/
+    
+    bool isAumentarVelocidadUsado = false;
+
 
     sf::Vector2f TECHO;
 	sf::Vector2f PISO;
@@ -62,6 +68,10 @@ private:
     sf::Clock clock2;
 
     int yTexture = 0;
+
+
+    std::vector<std::unique_ptr<Bala>> balas;
+
 
 public:
     
@@ -114,6 +124,18 @@ public:
     void morir();
 
     void collideWithBlock(int, int);
+
+    void setVelocidadX(float);
+    
+    void aumentarVelocidadX(float);
+
+    float getVelocidadX();
+
+    unsigned int getMonedas();
+
+    void aumentarMonedas();
+
+    void crearBala();
 };
 
 

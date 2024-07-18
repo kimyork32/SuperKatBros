@@ -1,0 +1,35 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+
+int main() {
+    std::ifstream inputFile("input.txt");
+    std::ofstream outputFile("output.txt");
+    
+    if (!inputFile.is_open() || !outputFile.is_open()) {
+        std::cerr << "Error al abrir el archivo!" << std::endl;
+        return 1;
+    }
+    
+    std::string line;
+    while (std::getline(inputFile, line)) {
+        std::stringstream ss(line);
+        std::string token;
+        bool first = true;
+        
+        while (std::getline(ss, token, ',')) {
+            if (!first) {
+                outputFile << " ";
+            }
+            outputFile << token;
+            first = false;
+        }
+        outputFile << "\n";
+    }
+    
+    inputFile.close();
+    outputFile.close();
+    
+    return 0;
+}

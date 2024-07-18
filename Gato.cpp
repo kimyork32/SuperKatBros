@@ -5,15 +5,14 @@ Gato::Gato(float x, float y) {
 	hitBox.setSize(sf::Vector2f(anchoHitbox, altoHitbox));
     hitBox.setFillColor(sf::Color::Red);
 
-    velocidadX = 320.0f;
-    velocidadY = 0.0f;
+    this->monedas = 0;
 
-    left = false;
-    right = false;
+    this->left = false;
+    this->right = false;
 
-    spacePressed = false;
-    jumpButtonPressed = false;
-    teclaSuelta = false;
+    this->spacePressed = false;
+    this->jumpButtonPressed = false;
+    this->teclaSuelta = false;
 
     deltaTime = 0;
     jumpTime = 0.0f;
@@ -45,7 +44,7 @@ void Gato::processEvents(const sf::Event& event) {
 }
 
 void Gato::saltar() {
-    if (hitBox.getPosition().y + 1 >= PISO.y - altoHitbox) {
+    if (getPosY() + 1 >= PISO.y - altoHitbox) {
         velocidadY = JUMP_FORCE / MASS;
         jumpTime = 0.0f;
     }
@@ -70,24 +69,32 @@ void Gato::applyGravity() {
 
 
 void Gato::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
-    if ((hitBox.getPosition().y >= 0 && hitBox.getPosition().y + altoHitbox < numRows * cellSize) &&
-        (hitBox.getPosition().x >= 0 && hitBox.getPosition().x + altoHitbox < numCols * cellSize)) {
-        for (int i = hitBox.getPosition().y / cellSize; i < numRows; i++) {
-            if (map[i][hitBox.getPosition().x / cellSize] != 0 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] != 0) {
+    if ((getPosY() >= 0 && getPosY() + altoHitbox < numRows * cellSize) &&
+        (getPosX() >= 0 && getPosX() + altoHitbox < numCols * cellSize)) {
+        for (int i = getPosY() / cellSize; i < numRows; i++) {
+            //if (map[i][getPosX() / cellSize] != 0 || map[i][(getPosX() + hitBox.getSize().x) / cellSize] != 0) {
+            if ((map[i][getPosX() / cellSize] >= rangeBloqueBegin || map[i][(getPosX() + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
+                (map[i][getPosX() / cellSize] <= rangeBloqueEspecialEnd || map[i][(getPosX() + hitBox.getSize().x) / cellSize] <= rangeBloqueEspecialEnd)) {
                 PISO.y = i * cellSize;
 
-                PISO.x = hitBox.getPosition().x + anchoHitbox / 2;
+                PISO.x = getPosX() + anchoHitbox / 2;
                 break;
             }
             else {
                 PISO.y = 400.0f;
+                PISO.x = getPosX() + anchoHitbox / 2;
             }
         }
 
-        for (int i = hitBox.getPosition().y / cellSize; i >= 0; i--) {
-            if (map[i][hitBox.getPosition().x / cellSize] != 0 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] != 0){
+        for (int i = getPosY() / cellSize; i >= 0; i--) {
+            //if (map[i][getPosX() / cellSize] != 0 || map[i][(getPosX() + hitBox.getSize().x) / cellSize] != 0){
+            if ((map[i][getPosX() / cellSize] >= rangeBloqueBegin || map[i][(getPosX() + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
+                (map[i][getPosX() / cellSize] <= rangeBloqueEspecialEnd || map[i][(getPosX() + hitBox.getSize().x) / cellSize] <= rangeBloqueEspecialEnd)) {
+
+                //std::cout << map[i][getPosY() / cellSize] << " " << map[i][(getPosX() + hitBox.getSize().x) / cellSize] << std::endl;
+
                 TECHO.y = (i + 1) * cellSize;
-                TECHO.x = hitBox.getPosition().x + anchoHitbox / 2;
+                TECHO.x = getPosX() + anchoHitbox / 2;
                 break;
             }
             else {
@@ -98,14 +105,19 @@ void Gato::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
 }
 
 void Gato::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
-    if ((hitBox.getPosition().y >= 0 && hitBox.getPosition().y + altoHitbox < numRows * cellSize) &&
-        (hitBox.getPosition().x >= 0 && hitBox.getPosition().x + anchoHitbox < numCols * cellSize)) {
+    if ((getPosY() >= 0 && getPosY() + altoHitbox < numRows * cellSize) &&
+        (getPosX() >= 0 && getPosX() + anchoHitbox < numCols * cellSize)) {
 
         // Detección a la derecha
-        for (int i = hitBox.getPosition().x / cellSize; i < numCols; i++) {
-            if (map[hitBox.getPosition().y / cellSize][i] != 0 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] != 0) {
+        for (int i = getPosX() / cellSize; i < numCols; i++) {
+            //if (map[getPosY() / cellSize][i] != 0 || map[(getPosY() + altoHitbox) / cellSize][i] != 0) {
+            if ((map[getPosY() / cellSize][i] >= rangeBloqueBegin || map[(getPosY() + altoHitbox) / cellSize][i] >= rangeBloqueBegin) &&
+                (map[getPosY() / cellSize][i] <= rangeBloqueEspecialEnd || map[(getPosY() + altoHitbox) / cellSize][i] <= rangeBloqueEspecialEnd)) {
+                
+                //std::cout << map[getPosY() / cellSize][i] << " " << map[(getPosY() + altoHitbox)/ cellSize][i] << std::endl;
+
                 OBJDER.x = i * cellSize;
-				OBJDER.y = hitBox.getPosition().y + altoHitbox / 2;
+				OBJDER.y = getPosY() + altoHitbox / 2;
                 break;
             }
             else {
@@ -114,10 +126,14 @@ void Gato::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
         }
 
         // Detección a la izquierda
-        for (int i = hitBox.getPosition().x / cellSize; i >= 0; i--) {
-            if (map[hitBox.getPosition().y / cellSize][i] != 0 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] != 0) {
+        for (int i = getPosX() / cellSize; i >= 0; i--) {
+            //if (map[getPosY() / cellSize][i] != 0 || map[(getPosY() + altoHitbox) / cellSize][i] != 0) {
+            if ((map[getPosY() / cellSize][i] >= rangeBloqueBegin || map[(getPosY() + altoHitbox) / cellSize][i] >= rangeBloqueBegin) && 
+                (map[getPosY() / cellSize][i] <= rangeBloqueEspecialEnd || map[(getPosY() + altoHitbox) / cellSize][i] <= rangeBloqueEspecialEnd)) {
+
+
                 OBJIZQ.x = (i + 1) * cellSize;
-				OBJIZQ.y = hitBox.getPosition().y + altoHitbox / 2;
+				OBJIZQ.y = getPosY() + altoHitbox / 2;
                 break;
             }
             else {
@@ -129,7 +145,7 @@ void Gato::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
 
 
 void Gato::controlarMovimientoVertical(const std::vector<std::vector<int>>& map) {
-    float nextMove = hitBox.getPosition().y + velocidadY * deltaTime;
+    float nextMove = getPosY() + velocidadY * deltaTime;
     if (nextMove < TECHO.y) {
         collideWithBlock(static_cast<int>(TECHO.x / cellSize), static_cast<int>(TECHO.y / cellSize) - 1.0f);
         nextMove = TECHO.y;
@@ -137,11 +153,11 @@ void Gato::controlarMovimientoVertical(const std::vector<std::vector<int>>& map)
         teclaSuelta = true;
     }
 
-    hitBox.move(0.f, nextMove - hitBox.getPosition().y);
+    hitBox.move(0.f, nextMove - getPosY());
 
-    if (hitBox.getPosition().y + altoHitbox > PISO.y) {
+    if (getPosY() + altoHitbox > PISO.y) {
         //collideWithBlock(static_cast<int>(PISO.x / cellSize), static_cast<int>(PISO.y / cellSize));
-        hitBox.setPosition(hitBox.getPosition().x, PISO.y - altoHitbox - 1.0f);
+        hitBox.setPosition(getPosX(), PISO.y - altoHitbox - 1.0f);
         velocidadY = 0.0f;
     }
 }
@@ -160,15 +176,17 @@ void Gato::controlarMovimientoHorizontal(float deltaTime, const std::vector<std:
     }
     
     if (proxMovimientoX != 0) {
-		
-        if (hitBox.getPosition().x + anchoHitbox + proxMovimientoX > OBJDER.x) {
+        std::cout << OBJDER.x << " " << getPosX() + anchoHitbox + proxMovimientoX << std::endl;
+        if (getPosX() + anchoHitbox + proxMovimientoX > OBJDER.x) {
 			//collideWithBlock(static_cast<int>(OBJDER.x / cellSize), static_cast<int>(OBJDER.y / cellSize));
-			proxMovimientoX = OBJDER.x - hitBox.getPosition().x - anchoHitbox - 1.0f;
+			proxMovimientoX = OBJDER.x - getPosX() - anchoHitbox - 1.0f;
+            std::cout << "stop der " << std::endl;
         }
        
-        else if (hitBox.getPosition().x + proxMovimientoX < OBJIZQ.x) {
+        else if (getPosX() + proxMovimientoX < OBJIZQ.x) {
             //collideWithBlock(static_cast<int>(OBJIZQ.x / cellSize) - 1.0f, static_cast<int>(OBJIZQ.y / }cellSize));
-            proxMovimientoX = OBJIZQ.x - hitBox.getPosition().x + 1.0f;
+            proxMovimientoX = OBJIZQ.x - getPosX() + 1.0f;
+            std::cout << "stop izq" << std::endl;
         }
         else {
             hitBox.move(proxMovimientoX, 0.f);
@@ -180,7 +198,7 @@ void Gato::controlarMovimientoHorizontal(float deltaTime, const std::vector<std:
 
 
 void Gato::drawTo(sf::RenderWindow& window) {
-    window.draw(hitBox);
+    //window.draw(hitBox);
     window.draw(spriteGato);
 }
 
@@ -210,7 +228,7 @@ void Gato::moverHorizontalSprite(bool left, bool right) {
     if (!left && !right) {
         spriteGato.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
     }
-    spriteGato.setPosition(hitBox.getPosition().x - ((anchoSprite * escalaX - anchoHitbox) / 2), hitBox.getPosition().y - ((altoSprite * escalaY - altoHitbox) / 2));
+    spriteGato.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2), getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
 }
 
 
@@ -226,6 +244,10 @@ void Gato::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     controlarMovimientoHorizontal(deltaTime, map);
     controlarMovimientoVertical(map);
     moverHorizontalSprite(left, right);
+
+    //std::cout << "objD: " << OBJDER.x << " " << OBJDER.y << " objI: " << OBJIZQ.x << " " << OBJIZQ.y << std::endl;
+    //std::cout << "piso: " << PISO.y << " " << PISO.y << " techo: " << TECHO.x << " " << TECHO.y << std::endl;
+
 }
 
 sf::RectangleShape Gato::getHitBox() {
@@ -250,7 +272,7 @@ float Gato::getPosY() {
 
 
 void Gato::pararMovimientoXDer(float esquinaIzqObj) {
-	hitBox.move(esquinaIzqObj - hitBox.getPosition().x - anchoHitbox - 1.0f, 0);
+	hitBox.move(esquinaIzqObj - getPosX() - anchoHitbox - 1.0f, 0);
     spriteGato.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
 }
 
@@ -265,4 +287,31 @@ void Gato::morir() {
 
 void Gato::collideWithBlock(int i, int j) {
     notify(i, j);
+}
+
+void Gato::setVelocidadX(float velocidadX) {
+    this->velocidadX = velocidadX;
+}
+
+void Gato::aumentarVelocidadX(float velocidadPlus) {
+    if (!isAumentarVelocidadUsado) {
+        this->velocidadX = this->velocidadX + velocidadPlus;
+        isAumentarVelocidadUsado = true;
+    }
+}
+
+float Gato::getVelocidadX() {
+    return velocidadX;
+}
+
+unsigned int Gato::getMonedas() {
+    return monedas;
+}
+
+void Gato::aumentarMonedas() {
+    this-> monedas += 1;
+}
+
+void Gato::crearBala() {
+    balas.push_back(std::make_unique<Bala>(getPosX() + anchoHitbox / 2, getPosY() + altoHitbox / 2, left));
 }

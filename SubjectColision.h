@@ -4,16 +4,22 @@
 
 #include <vector>
 #include <memory>
+#include <iostream>
 #include "ObserverColision.h"
+#include "BloqueDestruible.h"
+
 
 class SubjectColision {
 public:
-    void addObserver(ObserverColision* observer);
-    void deleteObserver(size_t);
+    ~SubjectColision();
+    void addObserver(std::shared_ptr<ObserverColision>);
+    void deleteObserver(std::shared_ptr<Bloque>);
     void notify(int, int);
+    void printObserverColision();
+    unsigned short int countObservserDeletes = 0;
 
 private:
-    std::vector<ObserverColision*> observersColision;
+    std::vector<std::shared_ptr<ObserverColision>> observersColision;
 };
 
 #endif // SUBJECT_COLISION_H

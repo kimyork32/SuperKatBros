@@ -6,8 +6,19 @@
 #include <SFML\Graphics.hpp>
 
 class BloqueMoneda : public Bloque {
+//private:
+	//unsigned int vidas;
+	bool itemDropeado;
+
 public:
-	BloqueMoneda(float, float);
+	BloqueMoneda(float, float, unsigned int);
+
+	bool verificarItemDropeado();
+
+	void setItemDropeado(bool);
+	//void disminuirVida();
+
+	//unsigned int getVidas();
 };
 
 

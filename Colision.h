@@ -8,6 +8,9 @@
 #include "Enemigo.h"
 #include "Bloque.h"
 #include "Mapa.h"
+#include "Item.h"
+#include "ItemMoneda.h"
+#include "ItemCatnip.h"
 
 class Colision {
 private:
@@ -20,7 +23,8 @@ private:
 public:
     Colision() {}
     void verificarColisionHitboxEnemigo(Gato* gato, std::vector<std::unique_ptr<Enemigo>>&);
-    
+	
+	void verificarColisionHitboxItem(Gato* gato, std::vector<std::shared_ptr<Item>>&);
 };
 
 #endif // !COLISION

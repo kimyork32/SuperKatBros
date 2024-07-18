@@ -7,7 +7,10 @@
 #include "ObserverColision.h"
 #include "Mapa.h"
 
+
 #include <iostream>
+#include <string>
+
 
 class Bloque : public ObserverColision {
 protected:
@@ -15,7 +18,11 @@ protected:
 	float anchoHitbox = static_cast<float>(cellSize);
 	float altoHitbox = static_cast<float>(cellSize);
 	bool colisionDetect = false;
+	unsigned int vidas;
+	//std::string type;
+	
 public:
+
 	bool colisionArriba = false;
 	bool colisionAbajo = false;
 	bool colisionLadoIzq = false;
@@ -32,7 +39,10 @@ public:
 	float getPosY();
 	void onNotify(int, int) override;
 	bool verificarColision();
-	//void morir();
+	void setColisionDetect(bool);
+	void disminuirVida();
+	unsigned int getVidas();
+	std::string getType();
 };
 
 #endif // !BLOQUE_H

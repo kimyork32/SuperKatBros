@@ -1,0 +1,39 @@
+#include <SFML/Graphics.hpp>
+#include <iostream>
+
+sf::Image resizeImage(const sf::Image& originalImage, unsigned int newWidth, unsigned int newHeight) {
+    sf::Image newImage;
+    newImage.create(newWidth, newHeight);
+
+    for (unsigned int y = 0; y < newHeight; ++y) {
+        for (unsigned int x = 0; x < newWidth; ++x) {
+            unsigned int origX = x * originalImage.getSize().x / newWidth;
+            unsigned int origY = y * originalImage.getSize().y / newHeight;
+            newImage.setPixel(x, y, originalImage.getPixel(origX, origY));
+        }
+    }
+
+    return newImage;
+}
+
+int main() {
+    sf::Image originalImage;
+    if (!originalImage.loadFromFile("world_tileset.png")) {
+        std::cerr << "Error cargando la imagen" << std::endl;
+        return -1;
+    }
+
+    unsigned int newWidth = 1120;  // Ancho deseado
+    unsigned int newHeight = 1120; // Alto deseado
+
+    sf::Image resizedImage = resizeImage(originalImage, newWidth, newHeight);
+
+    if (resizedImage.saveToFile("mapa-splite1.png")) {
+        std::cout << "Imagen guardada correctamente" << std::endl;
+    }
+    else {
+        std::cerr << "Error guardando la imagen" << std::endl;
+    }
+
+    return 0;
+}

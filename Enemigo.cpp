@@ -8,6 +8,7 @@ Enemigo::Enemigo(float x, float y) {
     velocidadX = 170.0f;
     velocidadY = 0.0f;
 
+    this->deteccionPiso = hitBox.getPosition();
     left = false;
     right = false;
 
@@ -17,70 +18,90 @@ Enemigo::Enemigo(float x, float y) {
 
     deltaTime = 0;
     jumpTime = 0.0f;
-    //loadSpriteSheet("sprite.png");
 }
+
+//Enemigo::Enemigo(const Enemigo& other) :
+//    hitBox(other.hitBox),
+//    texturaGato(other.texturaGato),
+//    spriteGato(other.spriteGato),
+//    velocidadX(other.velocidadX),
+//    velocidadY(other.velocidadY),
+//    jumping(other.jumping),
+//    left(other.left),
+//    right(other.right),
+//    rebote(other.rebote),
+//    stop(other.stop),
+//    jumpTime(other.jumpTime),
+//    jumpButtonPressed(other.jumpButtonPressed),
+//    TECHO(other.TECHO),
+//    PISO(other.PISO),
+//    OBJDER(other.OBJDER),
+//    OBJIZQ(other.OBJIZQ),
+//    teclaSuelta(other.teclaSuelta),
+//    spacePressed(other.spacePressed),
+//    deltaTime(other.deltaTime),
+//    verificarMoverseMismaPlataforma(other.verificarMoverseMismaPlataforma),
+//    pisoUnicoPlataforma(other.pisoUnicoPlataforma),
+//    deteccionPiso(other.deteccionPiso),
+//    yTexture(other.yTexture),
+//    clock2(other.clock2) {}
+
 
 Enemigo::~Enemigo() {
     std::cout << "enemigo muerto" << std::endl;
 }
-
-//void Enemigo::saltar() {
-//    if (hitBox.getPosition().y + 1 >= PISO - altoHitbox) {
-//        velocidadY = JUMP_FORCE / MASS;
-//        jumpTime = 0.0f;
-//    }
-//}
-
-//void Enemigo::controlarSalto() {
-//    this->jumpButtonPressed = static_cast<bool>(spacePressed && clock2.getElapsedTime().asMilliseconds() < 800 && !teclaSuelta);
-//
-//    if (jumpButtonPressed) {
-//        saltar();
-//        jumpTime += deltaTime;
-//        velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;
-//    }
-//}
 
 void Enemigo::applyGravity() {
     velocidadY += GRAVITY * deltaTime;
 }
 
 
-void Enemigo::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
-    if ((hitBox.getPosition().y >= 0 && hitBox.getPosition().y + altoHitbox < numRows * cellSize) &&
-        (hitBox.getPosition().x >= 0 && hitBox.getPosition().x + altoHitbox < numCols * cellSize)) {
-        for (int i = hitBox.getPosition().y / cellSize; i < numRows; i++) {
-            if ((map[i][hitBox.getPosition().x / cellSize] >= rangeBloqueBegin || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
-                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEnd+3 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEnd+3)) {
-                PISO = i * cellSize;
+void Enemigo::detectarPiso(const std::vector<std::vector<int>>& map, sf::Vector2f& PISO) {
+    if ((getPosY() >= 0 && getPosY() + altoHitbox < numRows * cellSize) &&
+        (getPosX() >= 0 && getPosX() + altoHitbox < numCols * cellSize)) {
+        for (int i = getPosY() / cellSize; i < numRows; i++) {
+            if ((map[i][getPosX() / cellSize] >= rangeBloqueBegin || map[i][(getPosX() + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
+                (map[i][getPosX() / cellSize] <= rangeBloqueEspecialEnd || map[i][(getPosX() + hitBox.getSize().x) / cellSize] <= rangeBloqueEspecialEnd)) {
+                PISO.y = i * cellSize;
+                PISO.x = static_cast<int>(getPosX() + anchoHitbox / 2);
                 break;
             }
             else {
-                PISO = 400.0f;
+                PISO.y = 400.0f;
+                PISO.x = static_cast<int>(getPosX() + anchoHitbox / 2);
             }
         }
+        
+    }
+}
 
-        for (int i = hitBox.getPosition().y / cellSize; i >= 0; i--) {
-            if ((map[i][hitBox.getPosition().x / cellSize] >= rangeBloqueBegin || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
-                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEnd+3 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEnd+3)) {
-                TECHO = (i + 1) * cellSize;
+void Enemigo::detectarTecho(const std::vector<std::vector<int>>& map) {
+    if ((getPosY() >= 0 && getPosY() + altoHitbox < numRows * cellSize) &&
+        (getPosX() >= 0 && getPosX() + altoHitbox < numCols * cellSize)) {
+        for (int i = getPosY() / cellSize; i >= 0; i--) {
+            if ((map[i][getPosX() / cellSize] >= rangeBloqueBegin || map[i][(getPosX() + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
+                (map[i][getPosX() / cellSize] <= rangeBloqueEspecialEnd || map[i][(getPosX() + hitBox.getSize().x) / cellSize] <= rangeBloqueEspecialEnd)) {
+                TECHO.y = (i + 1) * cellSize;
+                TECHO.x = getPosX() + anchoHitbox / 2;
                 break;
             }
             else {
-                TECHO = -1000.0f;
+                TECHO.y = -1000.0f;
+                TECHO.x = getPosX() + anchoHitbox / 2;
             }
         }
     }
 }
 
-void Enemigo::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
-    if ((hitBox.getPosition().y >= 0 && hitBox.getPosition().y + altoHitbox < numRows * cellSize) &&
-        (hitBox.getPosition().x >= 0 && hitBox.getPosition().x + anchoHitbox < numCols * cellSize)) {
+
+void Enemigo::detectarObjDer(const std::vector<std::vector<int>>& map) {
+    if ((getPosY() >= 0 && getPosY() + altoHitbox < numRows * cellSize) &&
+        (getPosX() >= 0 && getPosX() + anchoHitbox < numCols * cellSize)) {
 
         // Detección a la derecha
-        for (int i = hitBox.getPosition().x / cellSize; i < numCols; i++) {
-            if ((map[hitBox.getPosition().y / cellSize][i] >= rangeBloqueBegin || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] >= rangeBloqueBegin)&&
-                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEnd+3 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEnd+3)) {
+        for (int i = getPosX() / cellSize; i < numCols; i++) {
+            if ((map[getPosY() / cellSize][i] >= rangeBloqueBegin || map[(getPosY() + altoHitbox) / cellSize][i] >= rangeBloqueBegin) &&
+                (map[getPosY() / cellSize][i] <= rangeBloqueEspecialEnd || map[(getPosY() + altoHitbox) / cellSize][i] <= rangeBloqueEspecialEnd)) {
                 OBJDER = i * cellSize;
                 break;
             }
@@ -88,11 +109,17 @@ void Enemigo::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
                 OBJDER = numCols * cellSize;
             }
         }
+    }
+}
+
+void Enemigo::detectarObjIzq(const std::vector<std::vector<int>>& map) {
+    if ((getPosY() >= 0 && getPosY() + altoHitbox < numRows * cellSize) &&
+        (getPosX() >= 0 && getPosX() + anchoHitbox < numCols * cellSize)) {
 
         // Detección a la izquierda
-        for (int i = hitBox.getPosition().x / cellSize; i >= 0; i--) {
-            if ((map[hitBox.getPosition().y / cellSize][i] >= rangeBloqueBegin || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] >= rangeBloqueBegin) &&
-                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEnd+3 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEnd+3)) {
+        for (int i = getPosX() / cellSize; i >= 0; i--) {
+            if ((map[getPosY() / cellSize][i] >= rangeBloqueBegin || map[(getPosY() + altoHitbox) / cellSize][i] >= rangeBloqueBegin) &&
+                (map[getPosY() / cellSize][i] <= rangeBloqueEspecialEnd || map[(getPosY() + altoHitbox) / cellSize][i] <= rangeBloqueEspecialEnd)) {
                 OBJIZQ = (i + 1) * cellSize;
                 break;
             }
@@ -104,27 +131,27 @@ void Enemigo::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
 }
 
 
-void Enemigo::controlarMovimientoVertical(const std::vector<std::vector<int>>& map) {
-    float nextMove = hitBox.getPosition().y + velocidadY * deltaTime;
+void Enemigo::controlarMovimientoVertical() {
+    float nextMove = getPosY() + velocidadY * deltaTime;
 
-    if (nextMove < TECHO) {
-        nextMove = TECHO;
+    if (nextMove < TECHO.y) {
+        nextMove = TECHO.y;
         velocidadY = 0;
         teclaSuelta = true;
     }
 
-    hitBox.move(0.f, nextMove - hitBox.getPosition().y);
+    hitBox.move(0.f, nextMove - getPosY());
 
-    if (hitBox.getPosition().y + altoHitbox > PISO) {
-        hitBox.setPosition(hitBox.getPosition().x, PISO - altoHitbox - 1.0f);
+    if (getPosY() + altoHitbox > PISO.y) {
+        hitBox.setPosition(getPosX(), PISO.y - altoHitbox - 1.0f);
         velocidadY = 0.0f;
     }
 
 }
 
 
-void Enemigo::controlarMovimientoHorizontal(float deltaTime, const std::vector<std::vector<int>>& map) {
-
+void Enemigo::controlarMovimientoHorizontal(float deltaTime) {
+    
     float proxMovimientoX = 0.0f;
 
     if (!stop) {
@@ -134,16 +161,22 @@ void Enemigo::controlarMovimientoHorizontal(float deltaTime, const std::vector<s
             proxMovimientoX += velocidadX * deltaTime;
     }
 
-
+    //std::cout << OBJIZQ << " val oi : " << getPosX()  << std::endl;
     if (proxMovimientoX != 0) {
+        
+        if (verificarMoverseMismaPlataforma) {
+            if (PISO.y != pisoUnicoPlataforma.y) {
+                rebote = !rebote;
+            }
+        }
 
-        if (hitBox.getPosition().x + anchoHitbox + proxMovimientoX > OBJDER) {
-            proxMovimientoX = OBJDER - hitBox.getPosition().x - anchoHitbox - 1.0f;
+        if (getPosX() + anchoHitbox + proxMovimientoX >= OBJDER) {
+            proxMovimientoX = OBJDER - getPosX() - anchoHitbox - 1.0f;
             rebote = !rebote; 
         }
 
-        else if (hitBox.getPosition().x + proxMovimientoX < OBJIZQ) {
-            proxMovimientoX = OBJIZQ - hitBox.getPosition().x + 1.0f;
+        else if (getPosX() + proxMovimientoX <= OBJIZQ) {
+            proxMovimientoX = OBJIZQ - getPosX() + 1.0f;
             rebote = !rebote;
         }
         else {
@@ -189,24 +222,10 @@ void Enemigo::moverHorizontalSprite(bool left, bool right) {
         spriteGato.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
     }
     
-    spriteGato.setPosition(hitBox.getPosition().x - ((anchoSprite * escalaX - anchoHitbox) / 2), hitBox.getPosition().y - ((altoSprite * escalaY - altoHitbox) / 2));
+    spriteGato.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2), getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
 
 }
 
-
-void Enemigo::update(float deltaTime, const std::vector<std::vector<int>>& map) {
-    this->deltaTime = deltaTime;
-
-    detectarObjIzqDer(map);
-    detectarPisoTecho(map);
-
-    //controlarSalto();
-    applyGravity();
-
-    controlarMovimientoHorizontal(deltaTime, map);
-    controlarMovimientoVertical(map);
-    moverHorizontalSprite(left, right);
-}
 
 
 sf::RectangleShape Enemigo::getHitBox() {
@@ -229,11 +248,91 @@ float Enemigo::getPosY() {
     return hitBox.getPosition().y;
 }
 
-//void Enemigo::setVelocidadX(float velocidadX) {
-//    this->velocidadX = velocidadX;
-//}
 
 void Enemigo::parar() {
     this->stop = true;
 }
 
+void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> map, int a) {
+  
+    int f = numRows;
+    int c = numCols;
+
+    int p=-1;
+    //int a = static_cast<int>(getPosX() / cellSize);
+    int b = static_cast<int>(getPosY() / cellSize);
+    std::cout << "val ini: " << a << " " << b << std::endl;
+    for (int i = b + 1; i < f; i++) {
+        std::cout << "filaBl: " << a << " " << i << " " << map[i][a + 1] << " " << std::endl;;
+
+        if (map[i][a] != 0) {
+            p = i;
+            break;
+        }
+    }
+    if (p > 0) {
+        // IZQUIERDA
+        for (int i = a - 1; i >= 0; i--) {
+            if (map[p][i] != 0) {
+                
+                std::cout << "recorrido izq: " << i << " " << p << std::endl;
+                if (map[p - 1][i] != 0) {
+                    this->OBJIZQ = i * cellSize;
+                    break;
+                }
+            }
+            else {
+                this->OBJIZQ = (i + 1) * cellSize;
+                break;
+            }
+        }
+        std::cout << "val oi: " << OBJIZQ / cellSize  << std::endl;
+
+        // DERCHA
+        for (int i = a + 1; i < c; i++) {
+            if (map[p][i] != 0) {
+                std::cout << "recorrido der: " << i << " " << p << std::endl;
+                if (map[p - 1][i] != 0) {
+                    this->OBJDER = (i + 1) * cellSize;
+                    break;
+                }
+            }
+            else {
+                this->OBJDER = i * cellSize;
+                break;
+            }
+        }
+        std::cout << "val od: " << OBJDER / cellSize << std::endl;
+    }
+}
+
+void Enemigo::moverseMismaPlataforma(const std::vector<std::vector<int>> map) {
+    detectarOjbIzqDerPlataforma(map, static_cast<int>(this->deteccionPiso.x/cellSize));
+    detectarPiso(map, this->pisoUnicoPlataforma);
+    this->verificarMoverseMismaPlataforma = true;
+}
+
+void Enemigo::detectarPisoRoto(const std::vector<std::vector<int>> map) {
+    detectarPiso(map, this->deteccionPiso);
+    if (deteccionPiso.y != pisoUnicoPlataforma.y) {
+        this->pisoUnicoPlataforma = this->deteccionPiso;
+        moverseMismaPlataforma(map);
+    }
+}
+
+//void Enemigo::update(float deltaTime, const std::vector<std::vector<int>>& map) {
+//    this->deltaTime = deltaTime;
+//    detectarPiso(map, this->PISO);
+//    detectarTecho(map);
+//    if (!verificarMoverseMismaPlataforma) {
+//        detectarObjDer(map);
+//        detectarObjIzq(map);
+//    }
+//
+//    applyGravity();
+//
+//    detectarPisoRoto(map);
+//    controlarMovimientoHorizontal(deltaTime);
+//    controlarMovimientoVertical();
+//    moverHorizontalSprite(left, right);
+//}

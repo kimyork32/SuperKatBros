@@ -10,7 +10,7 @@ void Mapa::draw(sf::RenderWindow& window) {
     for (int row = 0; row < numRows; ++row) {
         for (int col = 0; col < numCols; ++col) {
             int tileValue = map[row][col];
-            if ((tileValue > 0 && tileValue < 49)) { // Enemigo
+            if ((tileValue > 0 && tileValue < cantBloquesMapaSprite)) { // Enemigo
                 sprites[tileValue - 1].setPosition(col * cellSize, row * cellSize);
                 window.draw(sprites[tileValue - 1]);
             }
@@ -50,11 +50,11 @@ void Mapa::loadSpriteSheet(const std::string& filename) {
         return;
     }
 
-    sprites.resize(49);
-    for (int i = 0; i < 49; ++i) {
+    sprites.resize(cantBloquesMapaSprite);
+    for (int i = 0; i < cantBloquesMapaSprite; ++i) {
         sprites[i].setTexture(texture);
-        int x = (i % 7) * cellSize;
-        int y = (i / 7) * cellSize;
+        int x = (i % numColumnasSpriteMapa) * cellSize;
+        int y = (i / numFilasSpriteMapa) * cellSize;
         sprites[i].setTextureRect(sf::IntRect(x, y, cellSize, cellSize));
     }
 }
@@ -62,6 +62,7 @@ void Mapa::loadSpriteSheet(const std::string& filename) {
 
 void Mapa::setValMap(int i, int j, int val) {
 	map[i][j] = val;
+
 }
 
 int Mapa::getValMap(int i, int j) const {

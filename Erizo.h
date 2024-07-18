@@ -4,11 +4,18 @@
 #define ERIZO_H
 
 #include "Enemigo.h"
+#include <vector>
+#include <memory>
 
 class Erizo : public Enemigo {
 public:
     Erizo(float x, float y);
-    void update(float deltaTime, const std::vector<std::vector<int>>& map) override;
+
+    Erizo(Erizo& other);
+    
+    void update(float deltaTime, const std::vector<std::vector<int>>&) override;
+
+    std::unique_ptr<CloneableEnemigo> clone(int newX, int newY) const override;
 
 private:
     void aumentarVelocidad();

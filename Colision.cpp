@@ -33,3 +33,22 @@ void Colision::verificarColisionHitboxEnemigo(Gato* gato, std::vector<std::uniqu
     }
 }
 
+
+void Colision::verificarColisionHitboxItem(Gato* gato, std::vector<std::shared_ptr<Item>>& items) {
+    for (size_t i = 0; i < items.size(); i++) {
+        if (items[i]->getHitBox().getGlobalBounds().intersects(gato->getHitBox().getGlobalBounds()))  {
+            if (auto moneda = std::dynamic_pointer_cast<Moneda>(items[i])) {
+                gato->aumentarMonedas();
+                items.erase(items.begin() + i);
+            }
+            else if (auto catnip = std::dynamic_pointer_cast<Catnip>(items[i])) {
+                gato->aumentarVelocidadX(catnip->getVelocidadX());
+                items.erase(items.begin() + i);
+            }
+        }
+        
+        else {
+            ++i; 
+        }
+    }
+}

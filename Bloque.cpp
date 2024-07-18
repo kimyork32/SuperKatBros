@@ -40,5 +40,14 @@ bool Bloque::verificarColision() {
 	return colisionDetect;
 }
 
+void Bloque::setColisionDetect(bool colisionDetect) {
+	this->colisionDetect = colisionDetect;
+}
 
+void Bloque::disminuirVida() {
+	this->vidas -= 1;
+}
 
+unsigned int Bloque::getVidas() {
+	return this->vidas;
+}

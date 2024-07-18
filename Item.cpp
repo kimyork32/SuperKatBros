@@ -2,27 +2,33 @@
 #include "Item.h"
 
 Item::Item(float x, float y) {
+
+    // para rebote aleatorio
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
     hitBox.setPosition(x, y);
     hitBox.setSize(sf::Vector2f(anchoHitbox, altoHitbox));
-    hitBox.setFillColor(sf::Color::Red);
-
+    hitBox.setFillColor(sf::Color::Black);
+    
     velocidadX = 170.0f;
     velocidadY = 0.0f;
 
-    left = false;
-    right = false;
+    //left = false;
+    //right = false;
 
-    spacePressed = false;
-    jumpButtonPressed = false;
-    teclaSuelta = false;
+    //spacePressed = false;
+    //jumpButtonPressed = false;
+    //teclaSuelta = false;
 
     deltaTime = 0;
-    jumpTime = 0.0f;
-    loadSpriteSheet("sprite.png");
+    //jumpTime = 0.0f;
+    //loadSpriteSheet("sprite.png");
+
+    this->rebote = std::rand() % 2;
 }
 
 Item::~Item() {
-    std::cout << "Item muerto" << std::endl;
+    //std::cout << "Item muerto" << std::endl;
 }
 
 
@@ -36,7 +42,7 @@ void Item::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
         (hitBox.getPosition().x >= 0 && hitBox.getPosition().x + altoHitbox < numCols * cellSize)) {
         for (int i = hitBox.getPosition().y / cellSize; i < numRows; i++) {
             if ((map[i][hitBox.getPosition().x / cellSize] >= rangeBloqueBegin || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
-                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEnd + 3 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEnd + 3)) {
+                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEspecialEnd|| map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEspecialEnd)) {
                 PISO = i * cellSize;
                 break;
             }
@@ -47,7 +53,7 @@ void Item::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
 
         for (int i = hitBox.getPosition().y / cellSize; i >= 0; i--) {
             if ((map[i][hitBox.getPosition().x / cellSize] >= rangeBloqueBegin || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
-                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEnd + 3 || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEnd + 3)) {
+                (map[i][hitBox.getPosition().x / cellSize] <= rangeBloqueEspecialEnd || map[i][(hitBox.getPosition().x + hitBox.getSize().x) / cellSize] <= rangeBloqueEspecialEnd)) {
                 TECHO = (i + 1) * cellSize;
                 break;
             }
@@ -65,7 +71,7 @@ void Item::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
         // Detección a la derecha
         for (int i = hitBox.getPosition().x / cellSize; i < numCols; i++) {
             if ((map[hitBox.getPosition().y / cellSize][i] >= rangeBloqueBegin || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] >= rangeBloqueBegin) &&
-                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEnd + 3 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEnd + 3)) {
+                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEspecialEnd || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEspecialEnd)) {
                 OBJDER = i * cellSize;
                 break;
             }
@@ -77,7 +83,7 @@ void Item::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
         // Detección a la izquierda
         for (int i = hitBox.getPosition().x / cellSize; i >= 0; i--) {
             if ((map[hitBox.getPosition().y / cellSize][i] >= rangeBloqueBegin || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] >= rangeBloqueBegin) &&
-                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEnd + 3 || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEnd + 3)) {
+                (map[hitBox.getPosition().y / cellSize][i] <= rangeBloqueEspecialEnd || map[(hitBox.getPosition().y + altoHitbox) / cellSize][i] <= rangeBloqueEspecialEnd)) {
                 OBJIZQ = (i + 1) * cellSize;
                 break;
             }
@@ -95,7 +101,7 @@ void Item::controlarMovimientoVertical(const std::vector<std::vector<int>>& map)
     if (nextMove < TECHO) {
         nextMove = TECHO;
         velocidadY = 0;
-        teclaSuelta = true;
+        //teclaSuelta = true;
     }
 
     hitBox.move(0.f, nextMove - hitBox.getPosition().y);
@@ -142,43 +148,43 @@ void Item::controlarMovimientoHorizontal(float deltaTime, const std::vector<std:
 
 void Item::drawTo(sf::RenderWindow& window) {
     window.draw(hitBox);
-    window.draw(spriteItem);
+    //window.draw(spriteItem);
 }
-
-sf::Vector2f Item::getPosition() const {
-    return hitBox.getPosition();
-}
-
-void Item::loadSpriteSheet(const std::string& filename) {
-    if (!texturaItem.loadFromFile(filename)) {
-        std::cerr << "Error cargando la textura" << std::endl;
-        return;
-    }
-    spriteItem.setTexture(texturaItem);
-    spriteItem.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
-    spriteItem.setScale(escalaX, escalaY);
-}
-
-void Item::moverHorizontalSprite(bool left, bool right) {
-    if (!stop) {
-        if (rebote) {
-            yTexture = (int(spriteItem.getPosition().x) / velocidadSprite) % 3 * altoSprite;
-            spriteItem.setTextureRect(sf::IntRect(anchoSprite, yTexture, anchoSprite, altoSprite));
-        }
-        if (!rebote) {
-            yTexture = (int(spriteItem.getPosition().x) / velocidadSprite) % 3 * altoSprite;
-            spriteItem.setTextureRect(sf::IntRect(anchoSprite * 3, yTexture, anchoSprite, altoSprite));
-        }
-    }
-    else {
-        spriteItem.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
-    }
-
-    spriteItem.setPosition(hitBox.getPosition().x - ((anchoSprite * escalaX - anchoHitbox) / 2), hitBox.getPosition().y - ((altoSprite * escalaY - altoHitbox) / 2));
-
-}
-
-
+//
+//sf::Vector2f Item::getPosition() const {
+//    return hitBox.getPosition();
+//}
+//
+//void Item::loadSpriteSheet(const std::string& filename) {
+//    if (!texturaItem.loadFromFile(filename)) {
+//        std::cerr << "Error cargando la textura" << std::endl;
+//        return;
+//    }
+//    spriteItem.setTexture(texturaItem);
+//    spriteItem.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+//    spriteItem.setScale(escalaX, escalaY);
+//}
+//
+//void Item::moverHorizontalSprite(bool left, bool right) {
+//    if (!stop) {
+//        if (rebote) {
+//            yTexture = (int(spriteItem.getPosition().x) / velocidadSprite) % 3 * altoSprite;
+//            spriteItem.setTextureRect(sf::IntRect(anchoSprite, yTexture, anchoSprite, altoSprite));
+//        }
+//        if (!rebote) {
+//            yTexture = (int(spriteItem.getPosition().x) / velocidadSprite) % 3 * altoSprite;
+//            spriteItem.setTextureRect(sf::IntRect(anchoSprite * 3, yTexture, anchoSprite, altoSprite));
+//        }
+//    }
+//    else {
+//        spriteItem.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+//    }
+//
+//    spriteItem.setPosition(hitBox.getPosition().x - ((anchoSprite * escalaX - anchoHitbox) / 2), hitBox.getPosition().y - ((altoSprite * escalaY - altoHitbox) / 2));
+//
+//}
+//
+//
 void Item::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     this->deltaTime = deltaTime;
 
@@ -188,37 +194,40 @@ void Item::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     applyGravity();
 
     controlarMovimientoHorizontal(deltaTime, map);
-    //controlarMovimientoVertical(map);
-    moverHorizontalSprite(left, right);
+    
+    controlarMovimientoVertical(map);
+
+    //moverHorizontalSprite(left, right);
 }
-
-
+//
+//
 sf::RectangleShape Item::getHitBox() {
     return hitBox;
 }
-
-float Item::getAnchoHitbox() {
-    return anchoHitbox;
-}
-
-float Item::getAltoHitbox() {
-    return altoHitbox;
-}
-
-float Item::getPosX() {
-    return hitBox.getPosition().x;
-}
-
-float Item::getPosY() {
-    return hitBox.getPosition().y;
-}
-
-//void Item::setVelocidadX(float velocidadX) {
-//    this->velocidadX = velocidadX;
+//
+//float Item::getAnchoHitbox() {
+//    return anchoHitbox;
 //}
-
-void Item::parar() {
-    this->stop = true;
-}
-
+//
+//float Item::getAltoHitbox() {
+//    return altoHitbox;
+//}
+//
+//float Item::getPosX() {
+//    return hitBox.getPosition().x;
+//}
+//
+//float Item::getPosY() {
+//    return hitBox.getPosition().y;
+//}
+//
+////void Item::setVelocidadX(float velocidadX) {
+////    this->velocidadX = velocidadX;
+////}
+//
+//void Item::parar() {
+//    this->stop = true;
+//}
+//
+//
 

@@ -2,11 +2,13 @@
 #define ENEMIGO_H
 
 #include <SFML/Graphics.hpp>
+#include "Definitions.hpp"
+#include "CloneableEnemigo.h"
+
 #include <iostream>
 #include <vector>
-#include "Definitions.hpp"
 
-class Enemigo {
+class Enemigo : public CloneableEnemigo {
 protected:
 
     sf::RectangleShape hitBox;
@@ -35,54 +37,66 @@ protected:
     bool left;
     bool right;
     bool rebote = false;
-	bool stop = false;
+    bool stop = false;
 
     float jumpTime;
 
     bool jumpButtonPressed;
 
-    float TECHO;
-    float PISO;
 
-    float OBJDER;
-    float OBJIZQ;
+    // -1.0f solo para inicializar
+    sf::Vector2f TECHO;
+    sf::Vector2f PISO;
+
+    float OBJDER = -1.0f;
+    float OBJIZQ = -1.0f;
 
     bool teclaSuelta;
     bool spacePressed;
     float deltaTime;
-    sf::Clock clock2;
+
+    bool verificarMoverseMismaPlataforma = false;
+
+    sf::Vector2f pisoUnicoPlataforma;
+    sf::Vector2f deteccionPiso;
 
     int yTexture = 0;
+    
+    sf::Clock clock2;
+
 
 public:
 
 
     Enemigo(float, float);
 
+    //Enemigo(const Enemigo& other);
+
     ~Enemigo();
 
     bool colisionLados = false;
 
-    
-    //void saltar();
 
-    void detectarPisoTecho(const std::vector<std::vector<int>>&);
+    virtual void detectarPiso(const std::vector<std::vector<int>>&, sf::Vector2f&);
 
-    void detectarObjIzqDer(const std::vector<std::vector<int>>&);
+    virtual void detectarTecho(const std::vector<std::vector<int>>&);
 
-    virtual void update(float, const std::vector<std::vector<int>>&);
+    virtual void detectarObjDer(const std::vector<std::vector<int>>&);
 
-    void drawTo(sf::RenderWindow&);
+    virtual void detectarObjIzq(const std::vector<std::vector<int>>&);
+
+    virtual void update(float, const std::vector<std::vector<int>>&) = 0;
+
+    virtual void drawTo(sf::RenderWindow&);
 
     sf::Vector2f getPosition() const;
 
-    //void controlarSalto();
 
     void applyGravity();
 
-    void controlarMovimientoVertical(const std::vector<std::vector<int>>&);
+    void controlarMovimientoVertical();
 
-    void controlarMovimientoHorizontal(float, const std::vector<std::vector<int>>&);
+    virtual void controlarMovimientoHorizontal(float);
 
     void loadSpriteSheet(const std::string&);
 
@@ -98,11 +112,13 @@ public:
 
     float getPosY();
 
-    //void setVelocidadX(float);
-
     void parar();
 
-    
+    void detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> map, int);
+
+    void moverseMismaPlataforma(const std::vector<std::vector<int>>);
+
+    void detectarPisoRoto(const std::vector<std::vector<int>>);
 
 };
 

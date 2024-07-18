@@ -6,8 +6,15 @@
 #include <SFML\Graphics.hpp>
 
 class BloqueItem : public Bloque {
+private:
+	bool itemDropeado;
 public:
 	BloqueItem(float, float);
+
+	bool verificarItemDropeado();
+
+	void setItemDropeado(bool);
+
 };
 
 
