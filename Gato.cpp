@@ -9,14 +9,18 @@ Gato::Gato(float x, float y) {
 
     this->left = false;
     this->right = false;
+    
+    this->velocidadVariableX = 0.f;
+    this->velocidadVariableY = 0.f;
 
     this->spacePressed = false;
     this->jumpButtonPressed = false;
-    this->teclaSuelta = false;
+    
 
     deltaTime = 0;
     jumpTime = 0.0f;
-    loadSpriteSheet("sprite.png");
+    loadSpriteSheet();
+    //loadSpriteSheet("sprite.png");
 }
 
 void Gato::processEvents(const sf::Event& event) {
@@ -28,6 +32,7 @@ void Gato::processEvents(const sf::Event& event) {
             right = true;
         if (event.key.code == sf::Keyboard::Space && !spacePressed) {
             spacePressed = true;
+            //teclaSuelta = false;
             clock2.restart();
         }
     }
@@ -38,33 +43,58 @@ void Gato::processEvents(const sf::Event& event) {
             right = false;
         if (event.key.code == sf::Keyboard::Space) {
             spacePressed = false;
-            teclaSuelta = false;
+            //teclaSuelta = true;
         }
     }
 }
 
+//void Gato::saltar() {
+//    if (getPosY() + 1 >= PISO.y - altoHitbox) {
+//        velocidadY = JUMP_FORCE / MASS;
+//        jumpTime = 0.0f;
+//    }
+//
+//    jumpTime += deltaTime;
+//    velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;  
+//}
+//
+//void Gato::controlarSalto() {
+//    this->jumpButtonPressed = static_cast<bool>(spacePressed && clock2.getElapsedTime().asMilliseconds() < 800 && !teclaSuelta);
+//
+//    if (jumpButtonPressed) {
+//        saltar();
+//   
+//    }
+//
+//    // aplicar gravedad
+//    velocidadY += GRAVITY * deltaTime;
+//}
+//
+
 void Gato::saltar() {
     if (getPosY() + 1 >= PISO.y - altoHitbox) {
-        velocidadY = JUMP_FORCE / MASS;
-        jumpTime = 0.0f;
+        velocidadY = JUMP_FORCE / MASS; // Velocidad inicial del salto
+        jumpTime = 0.0f; // Reiniciar el tiempo de salto
     }
+
+    // Actualizar el tiempo de salto
     jumpTime += deltaTime;
-    velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;  
+
+    // Aplicar la fuerza del salto
+    if (jumpTime < MAX_JUMP_TIME) {
+        velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;
+    }
 }
 
 void Gato::controlarSalto() {
-    this->jumpButtonPressed = static_cast<bool>(spacePressed && clock2.getElapsedTime().asMilliseconds() < 800 && !teclaSuelta);
-
+    this->jumpButtonPressed = static_cast<bool>(spacePressed  && !colisionPiso);
     if (jumpButtonPressed) {
         saltar();
-        
     }
-}
-
-void Gato::applyGravity() {
+    // Aplicar gravedad
     velocidadY += GRAVITY * deltaTime;
-}
 
+}
 
 
 
@@ -146,20 +176,40 @@ void Gato::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
 
 void Gato::controlarMovimientoVertical(const std::vector<std::vector<int>>& map) {
     float nextMove = getPosY() + velocidadY * deltaTime;
+    velocidadVariableY = velocidadY * deltaTime;
+
     if (nextMove < TECHO.y) {
         collideWithBlock(static_cast<int>(TECHO.x / cellSize), static_cast<int>(TECHO.y / cellSize) - 1.0f);
         nextMove = TECHO.y;
         velocidadY = 0;
-        teclaSuelta = true;
+        //teclaSuelta = true;
     }
 
     hitBox.move(0.f, nextMove - getPosY());
+    //std::cout << getPosY() + altoHitbox << " " << PISO.y << std::endl;
+
+    if (velocidadY > 0) {
+        colisionPiso = true;
+    }
 
     if (getPosY() + altoHitbox > PISO.y) {
         //collideWithBlock(static_cast<int>(PISO.x / cellSize), static_cast<int>(PISO.y / cellSize));
-        hitBox.setPosition(getPosX(), PISO.y - altoHitbox - 1.0f);
         velocidadY = 0.0f;
+
+        hitBox.setPosition(getPosX(), PISO.y - altoHitbox - 1.0f);
     }
+    //std::cout << velocidadY << " " << << std::endl;
+    if (velocidadY == 0 && !spacePressed) {
+        colisionPiso = false;
+    }
+
+    if (velocidadY != 0) {
+        jumping = true;
+    }
+    else {
+        jumping = false;
+    }
+
 }
 
 
@@ -168,25 +218,29 @@ void Gato::controlarMovimientoHorizontal(float deltaTime, const std::vector<std:
     float proxMovimientoX = 0.0f;
 
     if (left && !stopIzq) {
-
         proxMovimientoX -= velocidadX * deltaTime;
+        velocidadVariableX = proxMovimientoX;
     }
     if (right && !stopDer) {
         proxMovimientoX += velocidadX * deltaTime;
+        velocidadVariableX;
+    }
+    else {
+        velocidadVariableX = 0;
     }
     
     if (proxMovimientoX != 0) {
-        std::cout << OBJDER.x << " " << getPosX() + anchoHitbox + proxMovimientoX << std::endl;
+        //std::cout << OBJDER.x << " " << getPosX() + anchoHitbox + proxMovimientoX << std::endl;
         if (getPosX() + anchoHitbox + proxMovimientoX > OBJDER.x) {
 			//collideWithBlock(static_cast<int>(OBJDER.x / cellSize), static_cast<int>(OBJDER.y / cellSize));
 			proxMovimientoX = OBJDER.x - getPosX() - anchoHitbox - 1.0f;
-            std::cout << "stop der " << std::endl;
+            //std::cout << "stop der " << std::endl;
         }
        
         else if (getPosX() + proxMovimientoX < OBJIZQ.x) {
             //collideWithBlock(static_cast<int>(OBJIZQ.x / cellSize) - 1.0f, static_cast<int>(OBJIZQ.y / }cellSize));
             proxMovimientoX = OBJIZQ.x - getPosX() + 1.0f;
-            std::cout << "stop izq" << std::endl;
+            //std::cout << "stop izq" << std::endl;
         }
         else {
             hitBox.move(proxMovimientoX, 0.f);
@@ -196,40 +250,34 @@ void Gato::controlarMovimientoHorizontal(float deltaTime, const std::vector<std:
     
 }
 
-
-void Gato::drawTo(sf::RenderWindow& window) {
-    //window.draw(hitBox);
-    window.draw(spriteGato);
-}
-
 sf::Vector2f Gato::getPosition() const {
     return hitBox.getPosition();
 }
 
-void Gato::loadSpriteSheet(const std::string& filename) {
-    if (!texturaGato.loadFromFile(filename)) {
-        std::cerr << "Error cargando la textura" << std::endl;
-        return;
+void Gato::loadSpriteSheet() {
+
+    if (!texturaGatoCaminar.loadFromFile("spriteGatoCaminando.png")) {
+        std::cerr << "Error al cargar la textura" << std::endl;
     }
-    spriteGato.setTexture(texturaGato);
-    spriteGato.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
-    spriteGato.setScale(escalaX, escalaY);
+    if (!texturaGatoParado.loadFromFile("spriteGatoParado.png")) {
+        std::cerr << "Error al cargar la textura" << std::endl;
+    }
+
+    if (!texturaGatoSaltando.loadFromFile("spriteGatoSalto.png")) {
+        std::cerr << "Error al cargar la textura" << std::endl;
+    }
+
+    spriteGatoCaminar.setTexture(texturaGatoCaminar);
+    spriteGatoCaminar.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+
+    spriteGatoParado.setTexture(texturaGatoParado);
+    spriteGatoParado.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+
+    spriteGatoSaltando.setTexture(texturaGatoSaltando);
+    spriteGatoSaltando.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+
 }
 
-void Gato::moverHorizontalSprite(bool left, bool right) {
-    if (left) {
-        yTexture = (int(spriteGato.getPosition().x) / velocidadSprite) % 3 * altoSprite;
-        spriteGato.setTextureRect(sf::IntRect(anchoSprite, yTexture, anchoSprite, altoSprite));
-    }
-    if (right) {
-        yTexture = (int(spriteGato.getPosition().x) / velocidadSprite) % 3 * altoSprite;
-        spriteGato.setTextureRect(sf::IntRect(anchoSprite * 3, yTexture, anchoSprite, altoSprite));
-    }
-    if (!left && !right) {
-        spriteGato.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
-    }
-    spriteGato.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2), getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
-}
 
 
 void Gato::update(float deltaTime, const std::vector<std::vector<int>>& map) {
@@ -239,11 +287,12 @@ void Gato::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     detectarPisoTecho(map);
 
     controlarSalto();
-    applyGravity();
 
     controlarMovimientoHorizontal(deltaTime, map);
     controlarMovimientoVertical(map);
-    moverHorizontalSprite(left, right);
+    moverSprites();
+    //std::cout << velocidadY << " " << velocidadY*0.5<< std::endl;
+
 
     //std::cout << "objD: " << OBJDER.x << " " << OBJDER.y << " objI: " << OBJIZQ.x << " " << OBJIZQ.y << std::endl;
     //std::cout << "piso: " << PISO.y << " " << PISO.y << " techo: " << TECHO.x << " " << TECHO.y << std::endl;
@@ -301,7 +350,11 @@ void Gato::aumentarVelocidadX(float velocidadPlus) {
 }
 
 float Gato::getVelocidadX() {
-    return velocidadX;
+    return velocidadVariableX;
+}
+
+float Gato::getVelocidadY() {
+    return velocidadVariableY;
 }
 
 unsigned int Gato::getMonedas() {
@@ -314,4 +367,94 @@ void Gato::aumentarMonedas() {
 
 void Gato::crearBala() {
     balas.push_back(std::make_unique<Bala>(getPosX() + anchoHitbox / 2, getPosY() + altoHitbox / 2, left));
+}
+
+
+void Gato::drawTo(sf::RenderWindow& window) {
+    //window.draw(hitBox);
+    drawSprites(window);
+}
+
+
+void Gato::drawSprites(sf::RenderWindow& window) {
+    if (jumping) {
+        window.draw(spriteGatoSaltando);
+    }
+    else if ((!left && !right) || (left && right)) {
+        window.draw(spriteGatoParado);
+    }
+    else if (left || right) {
+        window.draw(spriteGatoCaminar);
+    }
+}
+
+void Gato::moverSprites() {
+
+    if (left && !right) {
+        spriteGatoCaminar.setScale(-escalaX, escalaY); // Invertir el sprite en el eje X
+        xTexture = (static_cast<int>(getPosX() / velocidadSprite) % numFigurasSprite) * static_cast<int>(anchoSprite);
+        spriteGatoCaminar.setTextureRect(sf::IntRect(xTexture, 0, anchoSprite, altoSprite));
+        spriteGatoCaminar.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2) + anchoSprite * escalaX, getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
+
+        countSpriteCambio = 0;
+        mirandoIzq = true;
+    }
+    else if (right && !left) {
+        spriteGatoCaminar.setScale(escalaX, escalaY); // No invertir el sprite
+        xTexture = (numFigurasSprite - 1 - static_cast<int>(getPosX() / velocidadSprite) % numFigurasSprite) * static_cast<int>(anchoSpriteParado);
+        spriteGatoCaminar.setTextureRect(sf::IntRect(xTexture, 0, anchoSpriteParado, altoSpriteParado));
+        spriteGatoCaminar.setPosition(getPosX() - ((anchoSpriteParado * escalaX - anchoHitbox) / 2), getPosY() - ((altoSpriteParado * escalaY - altoHitbox) / 2));
+        
+        countSpriteCambio = 0;
+        mirandoIzq = false;
+    }
+    else if ((!left && !right) || (left && right)) {
+        countSpriteCambio += velocidadX * deltaTime;
+        if (countSpriteCambio > 1000.0f) countSpriteCambio = 0;
+
+        if (mirandoIzq) {
+            spriteGatoParado.setScale(-escalaX, escalaY);
+            //std::cout << xTexture << std::endl;
+            xTexture = (static_cast<int>(countSpriteCambio / velocidadSpriteParado) % numFigurasSprite) * static_cast<int>(anchoSprite);
+            spriteGatoParado.setTextureRect(sf::IntRect(xTexture, 0, anchoSprite, altoSprite));
+            spriteGatoParado.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2) + anchoSprite * escalaX, getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
+
+        }
+        else {
+            //std::cout << xTexture << std::endl;
+            spriteGatoParado.setScale(escalaX, escalaY);
+            xTexture = (numFigurasSprite - 1 - static_cast<int>(countSpriteCambio / velocidadSpriteParado) % numFigurasSprite) * static_cast<int>(anchoSprite);
+            spriteGatoParado.setTextureRect(sf::IntRect(xTexture, 0, anchoSprite, altoSprite));
+            spriteGatoParado.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2), getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
+        }
+    }
+
+    if (jumping) {
+        if(velocidadY < 0){
+            if (mirandoIzq) {
+                spriteGatoSaltando.setScale(-escalaX, escalaY);
+                spriteGatoSaltando.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+                spriteGatoSaltando.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2) + anchoSprite * escalaX, getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
+            }
+            else {
+                spriteGatoSaltando.setScale(escalaX, escalaY);
+                spriteGatoSaltando.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
+                spriteGatoSaltando.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2), getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
+            }
+            
+            
+        }
+        else {
+            if (mirandoIzq) {
+                spriteGatoSaltando.setScale(-escalaX, escalaY);
+                spriteGatoSaltando.setTextureRect(sf::IntRect(anchoSprite, 0, anchoSprite, altoSprite));
+                spriteGatoSaltando.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2) + anchoSprite * escalaX, getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
+            }
+            else {
+                spriteGatoSaltando.setScale(escalaX, escalaY);
+                spriteGatoSaltando.setTextureRect(sf::IntRect(anchoSprite   , 0, anchoSprite, altoSprite));
+                spriteGatoSaltando.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2), getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
+            }
+        }
+    }
 }

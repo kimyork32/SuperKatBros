@@ -20,25 +20,45 @@ private:
     sf::Texture texturaGato;
     sf::Sprite spriteGato;
 
+    sf::Texture texturaGatoParado;
+    sf::Sprite spriteGatoParado;
+    
+    sf::Texture texturaGatoCaminar;
+    sf::Sprite spriteGatoCaminar;
+
+    sf::Texture texturaGatoSaltando;
+    sf::Sprite spriteGatoSaltando;
+
+    int xTexture;
 	 
-    const float anchoSprite = 25.0f;   // 100.0f x 4    s a w d
-    const float altoSprite = 39.0f;    // 195.0f x 5
+    const float anchoSprite = 32.0f;   // 100.0f x 4    s a w d
+    const float altoSprite = 32.0f;    // 195.0f x 5
+
+    const float anchoSpriteParado = 32.0f;
+    const float altoSpriteParado = 32.0f;
+
+    const int numFigurasSprite = 8;
 
     const float anchoHitbox = 50.0f;
     const float altoHitbox = 60.0f;  
 
 	const float excesoSprite = 1.0f;
-    const float escalaX = anchoHitbox / anchoSprite + excesoSprite;
-    const float escalaY = altoHitbox / altoSprite + excesoSprite;
+    const float escalaX = anchoHitbox / anchoSpriteParado + excesoSprite;
+    const float escalaY = altoHitbox / altoSpriteParado + excesoSprite;
     
     /*velocidadX;
     float velocidadY;*/
     float velocidadX = 370.0f;
     float velocidadY = 0.0f;
+    float velocidadVariableX;
+    float velocidadVariableY;
 
-    const int velocidadSprite = 120; // a menor es el valor -> mas rapido es el sprite
+    float countSpriteCambio = 0.f;
+    
+    float velocidadSpriteParado = 30.f;
 
-    bool jumping = false;
+    const int velocidadSprite = 50; // a menor es el valor -> mas rapido es el sprite
+
     
     bool left;
     bool right;
@@ -47,7 +67,13 @@ private:
 
     bool stopDer = false;
     bool stopIzq = false;
+    bool mirandoIzq = false;
+    bool jumping = false;
+    bool colisionPiso = false;
 
+    
+    bool spliteMiraLeft = false;
+    bool spliteEscalado = false;
 
     float jumpTime;
 
@@ -61,8 +87,7 @@ private:
 	sf::Vector2f PISO;
 	sf::Vector2f OBJDER;
 	sf::Vector2f OBJIZQ;
-
-    bool teclaSuelta;
+;
     bool spacePressed;
     float deltaTime;
     sf::Clock clock2;
@@ -81,28 +106,26 @@ public:
     void processEvents(const sf::Event&);
 
     void saltar();
-    
+
+    //float Gato::calcularAltura();
+
     void detectarPisoTecho(const std::vector<std::vector<int>>&);
 
     void detectarObjIzqDer(const std::vector<std::vector<int>>&);
 
     void update(float, const std::vector<std::vector<int>>&);
 
-    void drawTo(sf::RenderWindow& );
-
     sf::Vector2f getPosition() const;
 
     void controlarSalto();
-
-    void applyGravity();
 
     void controlarMovimientoVertical(const std::vector<std::vector<int>>&);
 
     void controlarMovimientoHorizontal(float, const std::vector<std::vector<int>>&);
 
-	void loadSpriteSheet(const std::string&);
+	void loadSpriteSheet();
 
-    void moverHorizontalSprite(bool, bool);
+    //void moverHorizontalSprite();
     
     sf::RectangleShape getHitBox();
 
@@ -131,11 +154,20 @@ public:
 
     float getVelocidadX();
 
+    float getVelocidadY();
+
     unsigned int getMonedas();
 
     void aumentarMonedas();
 
     void crearBala();
+
+    void drawTo(sf::RenderWindow&);
+
+    void drawSprites(sf::RenderWindow& window);
+
+    void moverSprites();
+
 };
 
 

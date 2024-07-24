@@ -261,9 +261,9 @@ void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> ma
     int p=-1;
     //int a = static_cast<int>(getPosX() / cellSize);
     int b = static_cast<int>(getPosY() / cellSize);
-    std::cout << "val ini: " << a << " " << b << std::endl;
+    //std::cout << "val ini: " << a << " " << b << std::endl;
     for (int i = b + 1; i < f; i++) {
-        std::cout << "filaBl: " << a << " " << i << " " << map[i][a + 1] << " " << std::endl;;
+        //std::cout << "filaBl: " << a << " " << i << " " << map[i][a + 1] << " " << std::endl;
 
         if (map[i][a] != 0) {
             p = i;
@@ -275,7 +275,7 @@ void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> ma
         for (int i = a - 1; i >= 0; i--) {
             if (map[p][i] != 0) {
                 
-                std::cout << "recorrido izq: " << i << " " << p << std::endl;
+                //std::cout << "recorrido izq: " << i << " " << p << std::endl;
                 if (map[p - 1][i] != 0) {
                     this->OBJIZQ = i * cellSize;
                     break;
@@ -286,12 +286,12 @@ void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> ma
                 break;
             }
         }
-        std::cout << "val oi: " << OBJIZQ / cellSize  << std::endl;
+        //std::cout << "val oi: " << OBJIZQ / cellSize  << std::endl;
 
         // DERCHA
         for (int i = a + 1; i < c; i++) {
             if (map[p][i] != 0) {
-                std::cout << "recorrido der: " << i << " " << p << std::endl;
+                //std::cout << "recorrido der: " << i << " " << p << std::endl;
                 if (map[p - 1][i] != 0) {
                     this->OBJDER = (i + 1) * cellSize;
                     break;
@@ -302,7 +302,7 @@ void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> ma
                 break;
             }
         }
-        std::cout << "val od: " << OBJDER / cellSize << std::endl;
+        //std::cout << "val od: " << OBJDER / cellSize << std::endl;
     }
 }
 

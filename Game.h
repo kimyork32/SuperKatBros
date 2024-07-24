@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory> 
 
+#include "BackGround.h"
 #include "Gato.h"
 #include "Enemigo.h"
 #include "Serpiente.h"
@@ -26,14 +27,17 @@
 class Game {
 public:
     Game()
-        : window(sf::VideoMode(windowSize, windowSize), "Mapa y Personaje"),
+        : window(sf::VideoMode(windowSizeAncho, windowSizeAlto), "Mapa y Personaje"),
         colision(),
+        //background(),
+        view(sf::FloatRect(0, 0, windowSizeAncho, windowSizeAlto)),
         mapa("map.txt", "mapaSplit.png")
     {
-        gato = std::make_unique<Gato>(11 * cellSize, 2 * cellSize);
+        gato = std::make_unique<Gato>(2 * cellSize, 2 * cellSize);
         crearEnemigos();
         crearBloques();
-        window.setView(view);
+        //window.setView(view);
+        background = std::make_unique< BackGround>();
         serpiente = std::make_unique<Serpiente>(5, 10);
         erizo = std::make_unique<Erizo>(15, 20);
         pezGlobo = std::make_unique<PezGlobo>(25, 30);
@@ -52,10 +56,14 @@ private:
     sf::RenderWindow window;
     sf::View view;
     Colision colision;
+    std::unique_ptr<BackGround> background;
     std::unique_ptr<Gato> gato;
     std::vector<std::unique_ptr<Enemigo>> enemigos;
     std::vector<std::shared_ptr<Bloque>> bloques;
     std::vector<std::shared_ptr<Item>> items;
+
+    // Coordenadas ventana flotante
+    sf::Vector2f posWindowFloat;
    
     // objetos clonables enemigo
     std::unique_ptr<Enemigo> serpiente = std::make_unique<Serpiente>(-1, -1);
@@ -72,6 +80,31 @@ private:
             if (event.type == sf::Event::Closed)
                 window.close();
             gato->processEvents(event);
+        }
+    }
+
+    void determinarLimiteVentana() {
+        posWindowFloat.x = gato->getPosX();
+        posWindowFloat.y = gato->getPosY();
+        
+        if (windowSizeAlto > numRows * cellSize) {
+            posWindowFloat.y = numRows * cellSize - windowSizeAlto / 2;
+        }
+        else if (posWindowFloat.y < windowSizeAlto / 2) {
+            posWindowFloat.y = windowSizeAlto / 2;
+        }
+        else if (posWindowFloat.y > numRows * cellSize - windowSizeAlto / 2) {
+            posWindowFloat.y = numRows * cellSize - windowSizeAlto / 2;
+        }
+
+        if (windowSizeAncho > numCols * cellSize) {
+            posWindowFloat.x = windowSizeAncho / 2;
+        }
+        else if (posWindowFloat.x < windowSizeAncho / 2) {
+            posWindowFloat.x = windowSizeAncho / 2;
+        }
+        else if (posWindowFloat.x > numCols * cellSize - windowSizeAncho / 2) {
+            posWindowFloat.x = numCols * cellSize - windowSizeAncho / 2;
         }
     }
 
@@ -99,6 +132,11 @@ private:
             item->update(deltaTime, mapa.getMap());
         }
 
+        // update fondo
+        //background->update(posWindowFloat.x, posWindowFloat.y);
+        //std::cout << posWindowFloat.x << " " << posWindowFloat.y << std::endl;
+        background->update(posWindowFloat.x, posWindowFloat.y);
+
         //verificar colision gato-enemigos
         colision.verificarColisionHitboxEnemigo(gato.get(), enemigos);
         //veriEne();
@@ -113,20 +151,29 @@ private:
         
         
         //std::cout << "tam vect items: " << items.size() << std::endl;
-
+        
+        // Determinar coordenadas de la ventana
+        determinarLimiteVentana();
         
         // Centrar la vista en el personaje
-        view.setCenter(gato->getPosition().x + cellSize / 2, gato->getPosition().y + cellSize / 2);
+        //view.setCenter(posWindowFloat.x, posWindowFloat.y);
+
+        //std::cout << numRows * cellSize << std::endl;
+        view.setCenter(posWindowFloat);
+
         window.setView(view);
     }
 
     void render() {
         window.clear(sf::Color(0, 191, 255));
+        
+        // Dibujar fondo
+        background->drawTo(window);
 
         // Dibujar mapa
         mapa.draw(window);
 
-        // Dibujar el personaje
+         //Dibujar el personaje
         gato->drawTo(window);
 
         // Dibujar enemigo
@@ -144,6 +191,13 @@ private:
             item->drawTo(window);
         }
 
+        // ########## TEST ##########
+        //sf::RectangleShape test;
+        //test.setFillColor(sf::Color::Yellow);
+        ////test.setSize(windowSizeAncho, windowSizeAlto);
+        //test.setPosition(0, 0);
+        //window.draw(test);
+        // ##########################
 
         window.display();
     }
@@ -151,6 +205,7 @@ private:
     void crearEnemigos() {
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
+
                 if (mapa.getValMap(i, j) == valEnemigoRata) {
                     std::cout << "Enemigo en " << i << " " << j << std::endl;
                     enemigos.push_back(std::make_unique<Rata>(j * cellSize, i * cellSize));

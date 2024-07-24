@@ -17,6 +17,9 @@ private:
     std::vector<sf::Sprite> sprites;
     sf::Texture texture;
 
+    float anchoSpriteBloqueMapa = 70.f;
+    float altoSpriteBloqueMapa = 70.f;
+
 
 public:
     Mapa(const std::string& filename, const std::string& spriteSheet);

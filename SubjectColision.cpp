@@ -64,7 +64,7 @@ void SubjectColision::deleteObserver(std::shared_ptr<Bloque> bloque) {
 
 void SubjectColision::printObserverColision() {
     for (auto& observer : observersColision) {
-        std::cout << observer->getType() << " ";
+        //std::cout << observer->getType() << " ";
     }
     std::cout  << std::endl;
 }

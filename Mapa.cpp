@@ -56,6 +56,8 @@ void Mapa::loadSpriteSheet(const std::string& filename) {
         int x = (i % numColumnasSpriteMapa) * cellSize;
         int y = (i / numFilasSpriteMapa) * cellSize;
         sprites[i].setTextureRect(sf::IntRect(x, y, cellSize, cellSize));
+        
+        //sprites[i].setScale();
     }
 }
 
@@ -66,5 +68,12 @@ void Mapa::setValMap(int i, int j, int val) {
 }
 
 int Mapa::getValMap(int i, int j) const {
+    //std::cout << i << " " << j << std::endl;
+
+    //if (i >= map.size() || i >= map[0].size()) {
+    //    std::cout << i << " " << j << std::endl;
+    //    std::cout << "fuera del rango" << std::endl;
+    //    //return -1;
+    //}
 	return map[i][j];
 }

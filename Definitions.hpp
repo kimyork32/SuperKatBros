@@ -1,12 +1,15 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-const int windowSize = 700; 
+const int windowSizeAncho = 1152; 
+const int windowSizeAlto = 864;
 
-const int numRows = 15;
+
+const int numRows = 10;
 const int numCols = 40;
 
 const int cellSize = 70;
+
 
 const float GRAVITY = 4500.0f;
 const float JUMP_FORCE = -8000.0f;
