@@ -13,6 +13,7 @@ private:
 	float OBJDER = -1.0f;
 	float altoHitbox;
 	float anchoHitbox;
+	float tiempoVida;
 	sf::CircleShape hitbox;
 	sf::Clock relojVida;
 
@@ -22,7 +23,11 @@ public:
 
 	void setVelocidadX(float);
 
+	float getVelocidadX() const;
+
 	void setRadio(float);
+
+	void setTiempoVida(float);
 
 	void moverX(float);
 

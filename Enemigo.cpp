@@ -17,38 +17,7 @@ Enemigo::Enemigo(float x, float y) {
     teclaSuelta = false;
 
     deltaTime = 0;
-    jumpTime = 0.0f;
-}
-
-//Enemigo::Enemigo(const Enemigo& other) :
-//    hitBox(other.hitBox),
-//    texturaGato(other.texturaGato),
-//    spriteGato(other.spriteGato),
-//    velocidadX(other.velocidadX),
-//    velocidadY(other.velocidadY),
-//    jumping(other.jumping),
-//    left(other.left),
-//    right(other.right),
-//    rebote(other.rebote),
-//    stop(other.stop),
-//    jumpTime(other.jumpTime),
-//    jumpButtonPressed(other.jumpButtonPressed),
-//    TECHO(other.TECHO),
-//    PISO(other.PISO),
-//    OBJDER(other.OBJDER),
-//    OBJIZQ(other.OBJIZQ),
-//    teclaSuelta(other.teclaSuelta),
-//    spacePressed(other.spacePressed),
-//    deltaTime(other.deltaTime),
-//    verificarMoverseMismaPlataforma(other.verificarMoverseMismaPlataforma),
-//    pisoUnicoPlataforma(other.pisoUnicoPlataforma),
-//    deteccionPiso(other.deteccionPiso),
-//    yTexture(other.yTexture),
-//    clock2(other.clock2) {}
-
-
-Enemigo::~Enemigo() {
-    std::cout << "enemigo muerto" << std::endl;
+    jumpTime = 0.0f;    
 }
 
 void Enemigo::applyGravity() {
@@ -161,7 +130,6 @@ void Enemigo::controlarMovimientoHorizontal(float deltaTime) {
             proxMovimientoX += velocidadX * deltaTime;
     }
 
-    //std::cout << OBJIZQ << " val oi : " << getPosX()  << std::endl;
     if (proxMovimientoX != 0) {
         
         if (verificarMoverseMismaPlataforma) {
@@ -259,11 +227,8 @@ void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> ma
     int c = numCols;
 
     int p=-1;
-    //int a = static_cast<int>(getPosX() / cellSize);
     int b = static_cast<int>(getPosY() / cellSize);
-    //std::cout << "val ini: " << a << " " << b << std::endl;
     for (int i = b + 1; i < f; i++) {
-        //std::cout << "filaBl: " << a << " " << i << " " << map[i][a + 1] << " " << std::endl;
 
         if (map[i][a] != 0) {
             p = i;
@@ -275,7 +240,6 @@ void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> ma
         for (int i = a - 1; i >= 0; i--) {
             if (map[p][i] != 0) {
                 
-                //std::cout << "recorrido izq: " << i << " " << p << std::endl;
                 if (map[p - 1][i] != 0) {
                     this->OBJIZQ = i * cellSize;
                     break;
@@ -286,12 +250,10 @@ void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> ma
                 break;
             }
         }
-        //std::cout << "val oi: " << OBJIZQ / cellSize  << std::endl;
 
         // DERCHA
         for (int i = a + 1; i < c; i++) {
             if (map[p][i] != 0) {
-                //std::cout << "recorrido der: " << i << " " << p << std::endl;
                 if (map[p - 1][i] != 0) {
                     this->OBJDER = (i + 1) * cellSize;
                     break;
@@ -302,7 +264,6 @@ void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> ma
                 break;
             }
         }
-        //std::cout << "val od: " << OBJDER / cellSize << std::endl;
     }
 }
 
@@ -319,20 +280,3 @@ void Enemigo::detectarPisoRoto(const std::vector<std::vector<int>> map) {
         moverseMismaPlataforma(map);
     }
 }
-
-//void Enemigo::update(float deltaTime, const std::vector<std::vector<int>>& map) {
-//    this->deltaTime = deltaTime;
-//    detectarPiso(map, this->PISO);
-//    detectarTecho(map);
-//    if (!verificarMoverseMismaPlataforma) {
-//        detectarObjDer(map);
-//        detectarObjIzq(map);
-//    }
-//
-//    applyGravity();
-//
-//    detectarPisoRoto(map);
-//    controlarMovimientoHorizontal(deltaTime);
-//    controlarMovimientoVertical();
-//    moverHorizontalSprite(left, right);
-//}

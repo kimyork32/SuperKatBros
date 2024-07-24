@@ -7,11 +7,12 @@
 
 class Aji : public Item {
 private:
+	int numBalas;
 	
 public:
 	Aji(float, float);
 	~Aji() {}
-	void disparar(Gato*, float, float, bool);
+	int getBalas() const;
 };
 
 #endif // ITEM_AJI_H

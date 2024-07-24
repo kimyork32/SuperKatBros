@@ -26,6 +26,7 @@ void Erizo::aumentarVelocidad() {
 void Erizo::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     this->deltaTime = deltaTime;
     
+    //loadSpriteSheet("sprite.png");
     detectarPiso(map, this->PISO);
     detectarTecho(map);
     if (!verificarMoverseMismaPlataforma) {

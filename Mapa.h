@@ -37,7 +37,7 @@ public:
     void setValMap(int, int, int);
 
 	int getValMap(int, int) const;
-    
+
 };
 
 #endif // !MAPA_H

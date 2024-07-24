@@ -1,6 +1,6 @@
 #pragma once
-#ifndef AGILA_H
-#define AGILA_H
+#ifndef AGUILA_H
+#define AGUILA_H
 
 #include "Enemigo.h"
 #include <vector>
@@ -8,7 +8,7 @@
 
 #define M_PI 3.14159265358979323846
 
-class Agila : public Enemigo {
+class Aguila : public Enemigo {
 private:
     bool verificarMoverseMismaPlataforma = false;
 
@@ -22,11 +22,11 @@ private:
     sf::Clock relojOscilacion;
 
 public:
-    Agila(float, float);
+    Aguila(float, float);
 
-    Agila(const Agila& other);
+    Aguila(const Aguila& other);
 
-    ~Agila() {};
+    ~Aguila() {};
 
     void update(float deltaTime, const std::vector<std::vector<int>>&) override;
 
@@ -37,4 +37,4 @@ public:
     std::unique_ptr<CloneableEnemigo> clone(int newX, int newY) const override;
 };
 
-#endif // AGILA_H
+#endif // AGUILA_H

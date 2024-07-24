@@ -1,13 +1,14 @@
-#include "Agila.h"
+#include "Aguila.h"
 
-Agila::Agila(float x, float y) : Enemigo(x, y) {
+Aguila::Aguila(float x, float y) : Enemigo(x, y) {
     this->maxRecorridoDer = getPosX() + (6 * cellSize);
     this->maxRecorridoIzq = getPosX() - ((6 + 1) * cellSize);
     //this->PISO = y + cellSize;
     this->yCentro = y + altoHitbox / 2;
+    loadSpriteSheet("sprite.png");
 }
 
-Agila::Agila(const Agila& other) :
+Aguila::Aguila(const Aguila& other) :
     Enemigo(other),
     verificarMoverseMismaPlataforma(other.verificarMoverseMismaPlataforma),
     maxRecorridoIzq(other.maxRecorridoIzq),
@@ -18,7 +19,7 @@ Agila::Agila(const Agila& other) :
     fase(other.fase),
     relojOscilacion(other.relojOscilacion) {}
 
-void Agila::update(float deltaTime, const std::vector<std::vector<int>>& map) {
+void Aguila::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     this->deltaTime = deltaTime;
     detectarPiso(map, this->PISO);
     detectarTecho(map);
@@ -35,13 +36,13 @@ void Agila::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     moverHorizontalSprite(left, right);
 }
 
-void Agila::determinarExtremosX() {
+void Aguila::determinarExtremosX() {
     if (getPosX() >= maxRecorridoDer || getPosX() <= maxRecorridoIzq) {
         rebote = !rebote;
     }
 }
 
-void Agila::determinarVuelo() {
+void Aguila::determinarVuelo() {
     // Calcula la nueva posición en y usando la fórmula de oscilación
     float tiempo = relojOscilacion.getElapsedTime().asSeconds();
     float nuevaY = yCentro + amplitud * std::sin(2 * M_PI * frecuencia * tiempo + fase);
@@ -51,6 +52,6 @@ void Agila::determinarVuelo() {
     
 }
 
-std::unique_ptr<CloneableEnemigo> Agila::clone(int newX, int newY) const {
-    return std::make_unique<Agila>(newX, newY);
+std::unique_ptr<CloneableEnemigo> Aguila::clone(int newX, int newY) const {
+    return std::make_unique<Aguila>(newX, newY);
 }

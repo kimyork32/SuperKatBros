@@ -43,6 +43,7 @@ void Mapa::loadMap(const std::string& filename) {
     file.close();
 }
 
+
 void Mapa::loadSpriteSheet(const std::string& filename) {
 
     if (!texture.loadFromFile(filename)) {
@@ -51,16 +52,16 @@ void Mapa::loadSpriteSheet(const std::string& filename) {
     }
 
     sprites.resize(cantBloquesMapaSprite);
-    for (int i = 0; i < cantBloquesMapaSprite; ++i) {
-        sprites[i].setTexture(texture);
-        int x = (i % numColumnasSpriteMapa) * cellSize;
-        int y = (i / numFilasSpriteMapa) * cellSize;
-        sprites[i].setTextureRect(sf::IntRect(x, y, cellSize, cellSize));
-        
-        //sprites[i].setScale();
+
+    for (int i = 0; i < numFilasSpriteMapa; i++) {
+        for (int j = 0; j < numColumnasSpriteMapa; j++) {
+            int index = i * numColumnasSpriteMapa + j;
+
+            sprites[index].setTexture(texture);
+            sprites[index].setTextureRect(sf::IntRect(j * cellSize, i * cellSize, cellSize, cellSize));
+        }
     }
 }
-
 
 void Mapa::setValMap(int i, int j, int val) {
 	map[i][j] = val;
@@ -68,12 +69,5 @@ void Mapa::setValMap(int i, int j, int val) {
 }
 
 int Mapa::getValMap(int i, int j) const {
-    //std::cout << i << " " << j << std::endl;
-
-    //if (i >= map.size() || i >= map[0].size()) {
-    //    std::cout << i << " " << j << std::endl;
-    //    std::cout << "fuera del rango" << std::endl;
-    //    //return -1;
-    //}
 	return map[i][j];
 }

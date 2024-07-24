@@ -6,10 +6,13 @@ Gato::Gato(float x, float y) {
     hitBox.setFillColor(sf::Color::Red);
 
     this->monedas = 0;
+    this->vidas = 3;
+    this->numBalas = 0;
 
     this->left = false;
     this->right = false;
-    
+    this->keyZ = false;
+
     this->velocidadVariableX = 0.f;
     this->velocidadVariableY = 0.f;
 
@@ -30,6 +33,8 @@ void Gato::processEvents(const sf::Event& event) {
             left = true;
         if (event.key.code == sf::Keyboard::Right)
             right = true;
+        if (event.key.code == sf::Keyboard::Z)
+            disparar();
         if (event.key.code == sf::Keyboard::Space && !spacePressed) {
             spacePressed = true;
             //teclaSuelta = false;
@@ -111,7 +116,8 @@ void Gato::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
                 break;
             }
             else {
-                PISO.y = 400.0f;
+                //PISO.y = 400.0f;
+                PISO.y = (numRows+1)*cellSize;
                 PISO.x = getPosX() + anchoHitbox / 2;
             }
         }
@@ -198,6 +204,11 @@ void Gato::controlarMovimientoVertical(const std::vector<std::vector<int>>& map)
 
         hitBox.setPosition(getPosX(), PISO.y - altoHitbox - 1.0f);
     }
+
+    if (getPosY() > numRows * cellSize) {
+        morir();
+    }
+
     //std::cout << velocidadY << " " << << std::endl;
     if (velocidadY == 0 && !spacePressed) {
         colisionPiso = false;
@@ -242,12 +253,12 @@ void Gato::controlarMovimientoHorizontal(float deltaTime, const std::vector<std:
             proxMovimientoX = OBJIZQ.x - getPosX() + 1.0f;
             //std::cout << "stop izq" << std::endl;
         }
+
         else {
             hitBox.move(proxMovimientoX, 0.f);
         }
         
     }
-    
 }
 
 sf::Vector2f Gato::getPosition() const {
@@ -291,11 +302,13 @@ void Gato::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     controlarMovimientoHorizontal(deltaTime, map);
     controlarMovimientoVertical(map);
     moverSprites();
-    //std::cout << velocidadY << " " << velocidadY*0.5<< std::endl;
-
-
-    //std::cout << "objD: " << OBJDER.x << " " << OBJDER.y << " objI: " << OBJIZQ.x << " " << OBJIZQ.y << std::endl;
-    //std::cout << "piso: " << PISO.y << " " << PISO.y << " techo: " << TECHO.x << " " << TECHO.y << std::endl;
+    
+    for (auto& bala : balas) {
+        bala->update(deltaTime, map);
+    }
+    verificarTiempoVidaBalas();
+    verificarColisionBalaBloque();
+    
 
 }
 
@@ -338,6 +351,14 @@ void Gato::collideWithBlock(int i, int j) {
     notify(i, j);
 }
 
+void Gato::setVidas(unsigned int vidas) {
+    this->vidas = this->vidas + vidas;
+}
+
+unsigned int Gato::getVidas() const {
+    return vidas;
+}
+
 void Gato::setVelocidadX(float velocidadX) {
     this->velocidadX = velocidadX;
 }
@@ -365,14 +386,20 @@ void Gato::aumentarMonedas() {
     this-> monedas += 1;
 }
 
-void Gato::crearBala() {
-    balas.push_back(std::make_unique<Bala>(getPosX() + anchoHitbox / 2, getPosY() + altoHitbox / 2, left));
+void Gato::setBalas(int numBalas) {
+    this->numBalas = this->numBalas + numBalas;
 }
 
+int Gato::getBalas() const {
+    return numBalas;
+}
 
 void Gato::drawTo(sf::RenderWindow& window) {
     //window.draw(hitBox);
     drawSprites(window);
+    for (auto& bala : balas) {
+        bala->drawTo(window);
+    }
 }
 
 
@@ -455,6 +482,51 @@ void Gato::moverSprites() {
                 spriteGatoSaltando.setTextureRect(sf::IntRect(anchoSprite   , 0, anchoSprite, altoSprite));
                 spriteGatoSaltando.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2), getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
             }
+        }
+    }
+}
+
+
+
+void Gato::disparar() {
+    if (numBalas != 0) {
+        std::unique_ptr<Bala> bala = std::make_unique<Bala>(getPosX() + anchoHitbox / 2, getPosY() + altoHitbox / 2, mirandoIzq);
+        bala->setVelocidadX(this->velocidadX*2);
+        bala->setTiempoVida(6.f);
+        balas.push_back(std::move(bala));
+
+        numBalas--;
+    }
+}
+
+bool Gato::verificarColisionBalaEnemigo(std::unique_ptr<Enemigo>& enemigo) {
+    for (int i = 0; i < balas.size();) {
+        if (enemigo->getHitBox().getGlobalBounds().intersects(balas[i]->getHitBox().getGlobalBounds())) {
+            balas.erase(balas.begin() + i);
+            return true;
+        }
+        i++;
+    }
+    return false;
+}
+
+
+void Gato::verificarColisionBalaBloque() {
+    for (int i = 0; i < balas.size(); i++) {
+        if (balas.at(i)->getPosX() + anchoHitbox > OBJDER.x) {
+            balas.erase(balas.begin() + i);
+        }
+
+        else if (getPosX() < OBJIZQ.x) {
+            balas.erase(balas.begin() + i);
+        }
+    }
+}
+
+void Gato::verificarTiempoVidaBalas() {
+    for (int i = 0; i < balas.size(); i++) {
+        if (balas.at(i)->verificarTiempoVida()) {
+            balas.erase(balas.begin() + i);
         }
     }
 }

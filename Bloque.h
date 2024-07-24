@@ -40,7 +40,7 @@ public:
 	void onNotify(int, int) override;
 	bool verificarColision();
 	void setColisionDetect(bool);
-	void disminuirVida();
+	void disminuirVida(); 
 	unsigned int getVidas();
 	std::string getType();
 };

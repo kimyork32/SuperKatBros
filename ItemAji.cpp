@@ -1,10 +1,11 @@
 #include "ItemAji.h"
 
 Aji::Aji(float x, float y) : Item(x, y) {
-	this->velocidadX = 100.0f;
+	std::cout << "item aji" << std::endl;
+	//this->velocidadX = 100.0f;
+	this->numBalas = 5;
 }
 
-
-void Aji::disparar(Gato* gato, float x, float y, bool direccionizq) {
-	gato->crearBala();
+int Aji::getBalas() const {
+	return numBalas;
 }

@@ -9,7 +9,7 @@ public:
 
 	~Moneda() {}
 
-	void aumentarMonedas(Gato*&);
+	//void aumentarMonedas(Gato*&);
 
 	void update(float deltaTime, const std::vector<std::vector<int>>& map) override;
 

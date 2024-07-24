@@ -9,6 +9,7 @@
 #include "Definitions.hpp"
 #include "SubjectColision.h"
 #include "Bala.h"
+#include "Enemigo.h"
 
 
 
@@ -62,8 +63,11 @@ private:
     
     bool left;
     bool right;
+    bool keyZ;
 
     unsigned int monedas;
+    unsigned int vidas;
+    unsigned int numBalas;
 
     bool stopDer = false;
     bool stopIzq = false;
@@ -96,6 +100,7 @@ private:
 
 
     std::vector<std::unique_ptr<Bala>> balas;
+    sf::Clock relojIntervaloBala;
 
 
 public:
@@ -148,8 +153,12 @@ public:
 
     void collideWithBlock(int, int);
 
-    void setVelocidadX(float);
+    unsigned int getVidas() const;
     
+    void setVidas(unsigned int);
+
+    void setVelocidadX(float);
+
     void aumentarVelocidadX(float);
 
     float getVelocidadX();
@@ -160,13 +169,25 @@ public:
 
     void aumentarMonedas();
 
-    void crearBala();
+    void setBalas(int);
+    
+    int getBalas() const;
 
     void drawTo(sf::RenderWindow&);
 
     void drawSprites(sf::RenderWindow& window);
 
     void moverSprites();
+
+    void disparar();
+
+    bool verificarColisionBalaEnemigo(std::unique_ptr<Enemigo>& gato);
+
+
+    void verificarColisionBalaBloque();
+
+    void verificarTiempoVidaBalas();
+
 
 };
 

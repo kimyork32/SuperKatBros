@@ -17,8 +17,8 @@ protected:
     sf::Sprite spriteGato;
 
 
-    const float anchoSprite = 25.0f;   // 100.0f x 4    s a w d
-    const float altoSprite = 39.0f;    // 195.0f x 5
+    const float anchoSprite = 25.0f;
+    const float altoSprite = 39.0f; 
 
     const float anchoHitbox = 50.0f;
     const float altoHitbox = 60.0f;
@@ -72,7 +72,7 @@ public:
 
     //Enemigo(const Enemigo& other);
 
-    ~Enemigo();
+    virtual ~Enemigo() = default;
 
     bool colisionLados = false;
 

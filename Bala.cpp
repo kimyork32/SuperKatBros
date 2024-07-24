@@ -4,6 +4,7 @@ Bala::Bala(int x, int y, bool direccionIzq) : direccionIzq(direccionIzq), veloci
     //this->radio = anchoHitbox;
     this->altoHitbox = 5.0f;
     this->anchoHitbox = 5.0f;
+    this->tiempoVida = 2.f;
     hitbox.setPosition(x, y);
     hitbox.setRadius(radio);
     hitbox.setFillColor(sf::Color::Red);
@@ -13,8 +14,16 @@ void Bala::setVelocidadX(float velocidadX) {
 	this->velocidadX = velocidadX;
 }
 
+float Bala::getVelocidadX() const {
+    return velocidadX;
+}
+
 void Bala::setRadio(float radio) {
 	this->radio = radio;
+}
+
+void Bala::setTiempoVida(float tiempoVida) {
+    this->tiempoVida = tiempoVida;
 }
 
 void Bala::moverX(float deltaTime) {
@@ -36,7 +45,7 @@ void Bala::moverX(float deltaTime) {
 bool Bala::verificarTiempoVida() {
 	float tiempoVida = relojVida.getElapsedTime().asSeconds();
 
-	if (tiempoVida > 2.0f) {
+	if (tiempoVida > tiempoVida) {
         return true;
     }
     return false;

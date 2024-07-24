@@ -5,8 +5,8 @@ const int windowSizeAncho = 1152;
 const int windowSizeAlto = 864;
 
 
-const int numRows = 10;
-const int numCols = 40;
+const int numRows = 20;
+const int numCols = 80;
 
 const int cellSize = 70;
 
@@ -18,8 +18,8 @@ const float MASS = 6.00f;
 const float velocidadX = 320.0f;
 
 // ESPECIFICACIONES DEL MAPA
-const unsigned int numFilasSpriteMapa = 7;
-const unsigned int numColumnasSpriteMapa = 7;
+const unsigned int numFilasSpriteMapa = 9;
+const unsigned int numColumnasSpriteMapa = 20;
 const unsigned int cantBloquesMapaSprite = numFilasSpriteMapa * numColumnasSpriteMapa;
 
 
@@ -56,7 +56,7 @@ const unsigned int valEnemigoRata = rangeEnemigoBegin + 0;			// 57
 const unsigned int valEnemigoErizo = rangeEnemigoBegin + 1;			// 58
 const unsigned int valEnemigoSerpiente = rangeEnemigoBegin + 2;		// 59
 const unsigned int valEnemigoPezGlobo = rangeEnemigoBegin + 3;		// 60
-const unsigned int valEnemigoAgila = rangeEnemigoBegin + 4;			// 61
+const unsigned int valEnemigoAguila = rangeEnemigoBegin + 4;			// 61
 
 
 

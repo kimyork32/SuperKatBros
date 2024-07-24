@@ -1,7 +1,7 @@
 #include "Colision.h"
 
 // colision con enemigos
-void Colision::verificarColisionHitboxEnemigo(Gato* gato, std::vector<std::unique_ptr<Enemigo>>& enemigos) {
+void Colision::verificarColisionHitboxEnemigo(std::unique_ptr<Gato>& gato, std::vector<std::unique_ptr<Enemigo>>& enemigos) {
     for (size_t i = 0; i < enemigos.size(); /* no incrementar i aquí */) {
         if (!enemigos[i]->getHitBox().getGlobalBounds().intersects(gato->getHitBox().getGlobalBounds())) {
 
@@ -34,7 +34,7 @@ void Colision::verificarColisionHitboxEnemigo(Gato* gato, std::vector<std::uniqu
 }
 
 
-void Colision::verificarColisionHitboxItem(Gato* gato, std::vector<std::shared_ptr<Item>>& items) {
+void Colision::verificarColisionHitboxItem(std::unique_ptr<Gato>& gato, std::vector<std::shared_ptr<Item>>& items) {
     for (size_t i = 0; i < items.size(); i++) {
         if (items[i]->getHitBox().getGlobalBounds().intersects(gato->getHitBox().getGlobalBounds()))  {
             if (auto moneda = std::dynamic_pointer_cast<Moneda>(items[i])) {
@@ -50,5 +50,15 @@ void Colision::verificarColisionHitboxItem(Gato* gato, std::vector<std::shared_p
         else {
             ++i; 
         }
+    }
+}
+
+
+void Colision::verificarColisionBalaEnemigo(std::unique_ptr<Gato>& gato, std::vector<std::unique_ptr<Enemigo>>& enemigos) {
+    for (int i = 0; i < enemigos.size();) {
+        if (gato->verificarColisionBalaEnemigo(enemigos[i])) {
+            enemigos.erase(enemigos.begin() + i);
+        }
+        ++i;
     }
 }

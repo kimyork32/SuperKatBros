@@ -11,6 +11,7 @@
 #include "Item.h"
 #include "ItemMoneda.h"
 #include "ItemCatnip.h"
+#include "Bala.h"
 
 class Colision {
 private:
@@ -22,9 +23,11 @@ private:
 
 public:
     Colision() {}
-    void verificarColisionHitboxEnemigo(Gato* gato, std::vector<std::unique_ptr<Enemigo>>&);
+    void verificarColisionHitboxEnemigo(std::unique_ptr<Gato>& gato, std::vector<std::unique_ptr<Enemigo>>&);
 	
-	void verificarColisionHitboxItem(Gato* gato, std::vector<std::shared_ptr<Item>>&);
+	void verificarColisionHitboxItem(std::unique_ptr<Gato>& gato, std::vector<std::shared_ptr<Item>>&);
+
+	void verificarColisionBalaEnemigo(std::unique_ptr<Gato>&, std::vector<std::unique_ptr<Enemigo>>&);
 };
 
 #endif // !COLISION
