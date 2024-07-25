@@ -1,6 +1,5 @@
-#pragma once
-#ifndef ENEMIGO_MANAGER_h
-#define ENEMIGO_MANAGER_h
+#ifndef ENEMIGOS_MANAGER_H
+#define ENEMIGOS_MANAGER_H
 
 #include <vector>
 #include <memory>
@@ -9,16 +8,23 @@
 #include "Mapa.h"
 #include "Gato.h"
 #include "Enemigo.h"
-#include "Serpiente.h"
-#include "Rata.h"
-#include "Erizo.h"
-#include "Aguila.h"
 #include "PezGlobo.h"
-
+#include "RataBuilder.h"
+#include "ErizoBuilder.h"
+#include "SerpienteBuilder.h"
+#include "PezGloboBuilder.h"
+#include "AguilaBuilder.h"
+#include "EnemigosDirector.h"
 
 class EnemigosManager {
 private:
     std::vector<std::unique_ptr<Enemigo>> enemigos;
+    RataBuilder enemigoRataBuilder;
+    ErizoBuilder enemigoErizoBuilder;
+    SerpienteBuilder enemigoSerpienteBuilder;
+    PezGloboBuilder enemigoPezGloboBuilder;
+    AguilaBuilder enemigoAguilaBuilder;
+    EnemigosDirector director;
 
 public:
     void crearEnemigos(std::unique_ptr<Mapa>& mapa) {
@@ -26,47 +32,50 @@ public:
             for (int j = 0; j < numCols; j++) {
 
                 if (mapa->getValMap(i, j) == valEnemigoRata) {
-                    std::cout << "Enemigo en " << i << " " << j << std::endl;
-                    enemigos.push_back(std::make_unique<Rata>(j * cellSize, i * cellSize));
-                    //enemigos.push_back(rata->clone(j * cellSize, i * cellSize));
-                    enemigos.back()->moverseMismaPlataforma(mapa->getMap());
+                    director.constructEnemigo(enemigoRataBuilder, j * cellSize, i * cellSize, cellSize, cellSize);
+                    enemigos.push_back(enemigoRataBuilder.getEnemigo());
                     mapa->setValMap(i, j, 0);
                 }
                 else if (mapa->getValMap(i, j) == valEnemigoErizo) {
-                    std::cout << "Enemigo en " << i << " " << j << std::endl;
-                    enemigos.push_back(std::make_unique<Erizo>(j * cellSize, i * cellSize));
-                    enemigos.back()->moverseMismaPlataforma(mapa->getMap());
+                    director.constructEnemigo(enemigoErizoBuilder, j * cellSize, i * cellSize, cellSize, cellSize);
+                    enemigos.push_back(enemigoErizoBuilder.getEnemigo());
                     mapa->setValMap(i, j, 0);
+                    enemigos.back()->moverseMismaPlataforma(mapa->getMap());
                 }
                 else if (mapa->getValMap(i, j) == valEnemigoSerpiente) {
-                    std::cout << "Enemigo en " << i << " " << j << std::endl;
-                    enemigos.push_back(std::make_unique<Serpiente>(j * cellSize, i * cellSize));
-                    enemigos.back()->moverseMismaPlataforma(mapa->getMap());
+                    director.constructEnemigo(enemigoSerpienteBuilder, j * cellSize, i * cellSize, cellSize, cellSize);
+                    enemigos.push_back(enemigoSerpienteBuilder.getEnemigo());
                     mapa->setValMap(i, j, 0);
+                    enemigos.back()->moverseMismaPlataforma(mapa->getMap());
                 }
                 else if (mapa->getValMap(i, j) == valEnemigoPezGlobo) {
-                    std::cout << "Enemigo en " << i << " " << j << std::endl;
-                    enemigos.push_back(std::make_unique<PezGlobo>(j * cellSize, i * cellSize));
-                    //enemigos.back()->moverseMismaPlataforma(mapa.getMap());
+                    director.constructEnemigo(enemigoPezGloboBuilder, j * cellSize, i * cellSize, cellSize, cellSize);
+                    enemigos.push_back(enemigoPezGloboBuilder.getEnemigo());
                     mapa->setValMap(i, j, 0);
                 }
                 else if (mapa->getValMap(i, j) == valEnemigoAguila) {
-                    std::cout << "Enemigo en " << i << " " << j << std::endl;
-                    enemigos.push_back(std::make_unique<Aguila>(j * cellSize, i * cellSize));
-                    //enemigos.back()->moverseMismaPlataforma(mapa.getMap());
+                    director.constructEnemigo(enemigoAguilaBuilder, j * cellSize, i * cellSize, cellSize, cellSize);
+                    std::unique_ptr<Enemigo> enemigoPtr = enemigoAguilaBuilder.getEnemigo();
+
+                    if (auto* aguila = dynamic_cast<Aguila*>(enemigoPtr.get())) {
+                        aguila->setYCentro(aguila->getPosY() + aguila->getAltoHitbox() / 2);
+                        aguila->setMaxRecorridoDer(aguila->getPosX() + (6 * cellSize));
+                        aguila->setMaxRecorridoIzq(aguila->getPosX() - ((6 + 1) * cellSize));
+                    }
+
+                    enemigos.push_back(std::move(enemigoPtr)); 
                     mapa->setValMap(i, j, 0);
                 }
             }
         }
     }
-    
-    void update(float deltaTime, const std::vector<std::vector<int>>& mapaMatriz, std::unique_ptr<Gato>& gato) {
+
+    void update(float deltaTime, const std::vector<std::vector<int>>& mapaMatriz, Gato& gato) {
         for (auto& enemigo : enemigos) {
             enemigo->update(deltaTime, mapaMatriz);
             if (auto* pezGlobo = dynamic_cast<PezGlobo*>(enemigo.get())) {
                 pezGlobo->verificarColisionBalaGato(gato);
             }
-
         }
     }
 
@@ -79,7 +88,6 @@ public:
             enemigo->drawTo(window);
         }
     }
-
 };
 
-#endif // !ENEMIGO_MANAGER_h
+#endif // ENEMIGOS_MANAGER_H

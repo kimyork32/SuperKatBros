@@ -7,8 +7,9 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
-class Enemigo : public CloneableEnemigo {
+class Enemigo {
 protected:
 
     sf::RectangleShape hitBox;
@@ -17,60 +18,63 @@ protected:
     sf::Sprite spriteGato;
 
 
-    const float anchoSprite = 25.0f;
-    const float altoSprite = 39.0f; 
+    float anchoSprite;
+    float altoSprite;
 
-    const float anchoHitbox = 50.0f;
-    const float altoHitbox = 60.0f;
+    float anchoHitbox;
+    float altoHitbox;
 
-    const float excesoSprite = 0.0f;
-    const float escalaX = anchoHitbox / anchoSprite + excesoSprite;
-    const float escalaY = altoHitbox / altoSprite + excesoSprite;
+    float excesoSprite;
+    float escalaX;
+    float escalaY;
 
     float velocidadX;
     float velocidadY;
 
-    const int velocidadSprite = 100; // a menor es el valor -> mas rapido es el sprite
+    int velocidadSprite; // a menor es el valor -> mas rapido es el sprite
 
-    bool jumping = false;
+    bool jumping;
 
     bool left;
     bool right;
-    bool rebote = false;
-    bool stop = false;
+    bool rebote;
+    bool stop;
 
     float jumpTime;
 
     bool jumpButtonPressed;
 
 
-    // -1.0f solo para inicializar
     sf::Vector2f TECHO;
     sf::Vector2f PISO;
 
-    float OBJDER = -1.0f;
-    float OBJIZQ = -1.0f;
+    float OBJDER;
+    float OBJIZQ;
 
     bool teclaSuelta;
     bool spacePressed;
     float deltaTime;
 
-    bool verificarMoverseMismaPlataforma = false;
+    bool verificarMoverseMismaPlataforma;
 
     sf::Vector2f pisoUnicoPlataforma;
     sf::Vector2f deteccionPiso;
 
-    int yTexture = 0;
-    
-    sf::Clock clock2;
+    int yTexture;
 
+    sf::Clock clock2;
+    float GRAVITY;
+    float JUMP_FORCE;
+    float MAX_JUMP_TIME;
+    float MASS;
+    
+    std::string spriteMoverFilename;
 
 public:
 
 
-    Enemigo(float, float);
-
-    //Enemigo(const Enemigo& other);
+    //Enemigo(float, float, float, float, float, float, float, float, int, float, float, float , float);
+    Enemigo();
 
     virtual ~Enemigo() = default;
 
@@ -101,16 +105,24 @@ public:
     void loadSpriteSheet(const std::string&);
 
     void moverHorizontalSprite(bool, bool);
-    
-	sf::RectangleShape getHitBox();
+
+    sf::RectangleShape getHitBox();
 
     float getAnchoHitbox();
 
     float getAltoHitbox();
+    
+    float getAnchoSprite();
+
+    float getAltoSprite();
+
+    float getExcesoSprite();
 
     float getPosX();
 
     float getPosY();
+
+    std::string getSpriteMoverFilename();
 
     void parar();
 
@@ -119,6 +131,23 @@ public:
     void moverseMismaPlataforma(const std::vector<std::vector<int>>);
 
     void detectarPisoRoto(const std::vector<std::vector<int>>);
+
+    void setPosicion(float, float);
+    void setTamanhoHitbox(float, float);
+    void setAnchoHitbox(float);
+    void setAltoHitbox(float);
+    void setExcesoSprite(float);
+    void setAnchoSprite(float);
+    void setAltoSprite(float);
+    void setEscalaX(float);
+    void setEscalaY(float);
+    void setVelocidadX(float);
+    void setVelocidadSprite(int);
+    void setGravedad(float);
+    void setFuerzaSalto(float);
+    void setMasa(float);
+    void setMaxTiempoSalto(float);
+    void setSpriteMoverFilename(std::string);
 
 };
 

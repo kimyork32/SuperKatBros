@@ -32,8 +32,6 @@ public:
 
     void loadSpriteSheet(const std::string& filename);
     
-    //void crearEnemigos(std::vector<Enemigo>& enemigos);
-
     void setValMap(int, int, int);
 
 	int getValMap(int, int) const;

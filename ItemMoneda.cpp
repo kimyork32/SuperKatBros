@@ -2,9 +2,6 @@
 
 Moneda::Moneda(float x, float y) : Item(x, y) {}
 
-//void Moneda::aumentarMonedas(Gato*& gato) {
-//	gato->aumentarMonedas();
-//}
 
 void Moneda::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     this->deltaTime = deltaTime;

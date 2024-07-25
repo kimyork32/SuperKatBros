@@ -53,39 +53,14 @@ void Gato::processEvents(const sf::Event& event) {
     }
 }
 
-//void Gato::saltar() {
-//    if (getPosY() + 1 >= PISO.y - altoHitbox) {
-//        velocidadY = JUMP_FORCE / MASS;
-//        jumpTime = 0.0f;
-//    }
-//
-//    jumpTime += deltaTime;
-//    velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;  
-//}
-//
-//void Gato::controlarSalto() {
-//    this->jumpButtonPressed = static_cast<bool>(spacePressed && clock2.getElapsedTime().asMilliseconds() < 800 && !teclaSuelta);
-//
-//    if (jumpButtonPressed) {
-//        saltar();
-//   
-//    }
-//
-//    // aplicar gravedad
-//    velocidadY += GRAVITY * deltaTime;
-//}
-//
-
 void Gato::saltar() {
     if (getPosY() + 1 >= PISO.y - altoHitbox) {
-        velocidadY = JUMP_FORCE / MASS; // Velocidad inicial del salto
-        jumpTime = 0.0f; // Reiniciar el tiempo de salto
+        velocidadY = JUMP_FORCE / MASS; 
+        jumpTime = 0.0f; 
     }
 
-    // Actualizar el tiempo de salto
     jumpTime += deltaTime;
 
-    // Aplicar la fuerza del salto
     if (jumpTime < MAX_JUMP_TIME) {
         velocidadY += (JUMP_FORCE / MASS) * deltaTime / MAX_JUMP_TIME;
     }
@@ -107,7 +82,6 @@ void Gato::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
     if ((getPosY() >= 0 && getPosY() + altoHitbox < numRows * cellSize) &&
         (getPosX() >= 0 && getPosX() + altoHitbox < numCols * cellSize)) {
         for (int i = getPosY() / cellSize; i < numRows; i++) {
-            //if (map[i][getPosX() / cellSize] != 0 || map[i][(getPosX() + hitBox.getSize().x) / cellSize] != 0) {
             if ((map[i][getPosX() / cellSize] >= rangeBloqueBegin || map[i][(getPosX() + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
                 (map[i][getPosX() / cellSize] <= rangeBloqueEspecialEnd || map[i][(getPosX() + hitBox.getSize().x) / cellSize] <= rangeBloqueEspecialEnd)) {
                 PISO.y = i * cellSize;
@@ -123,12 +97,10 @@ void Gato::detectarPisoTecho(const std::vector<std::vector<int>>& map) {
         }
 
         for (int i = getPosY() / cellSize; i >= 0; i--) {
-            //if (map[i][getPosX() / cellSize] != 0 || map[i][(getPosX() + hitBox.getSize().x) / cellSize] != 0){
             if ((map[i][getPosX() / cellSize] >= rangeBloqueBegin || map[i][(getPosX() + hitBox.getSize().x) / cellSize] >= rangeBloqueBegin) &&
                 (map[i][getPosX() / cellSize] <= rangeBloqueEspecialEnd || map[i][(getPosX() + hitBox.getSize().x) / cellSize] <= rangeBloqueEspecialEnd)) {
 
-                //std::cout << map[i][getPosY() / cellSize] << " " << map[i][(getPosX() + hitBox.getSize().x) / cellSize] << std::endl;
-
+                
                 TECHO.y = (i + 1) * cellSize;
                 TECHO.x = getPosX() + anchoHitbox / 2;
                 break;
@@ -146,12 +118,9 @@ void Gato::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
 
         // Detección a la derecha
         for (int i = getPosX() / cellSize; i < numCols; i++) {
-            //if (map[getPosY() / cellSize][i] != 0 || map[(getPosY() + altoHitbox) / cellSize][i] != 0) {
             if ((map[getPosY() / cellSize][i] >= rangeBloqueBegin || map[(getPosY() + altoHitbox) / cellSize][i] >= rangeBloqueBegin) &&
                 (map[getPosY() / cellSize][i] <= rangeBloqueEspecialEnd || map[(getPosY() + altoHitbox) / cellSize][i] <= rangeBloqueEspecialEnd)) {
                 
-                //std::cout << map[getPosY() / cellSize][i] << " " << map[(getPosY() + altoHitbox)/ cellSize][i] << std::endl;
-
                 OBJDER.x = i * cellSize;
 				OBJDER.y = getPosY() + altoHitbox / 2;
                 break;
@@ -163,7 +132,6 @@ void Gato::detectarObjIzqDer(const std::vector<std::vector<int>>& map) {
 
         // Detección a la izquierda
         for (int i = getPosX() / cellSize; i >= 0; i--) {
-            //if (map[getPosY() / cellSize][i] != 0 || map[(getPosY() + altoHitbox) / cellSize][i] != 0) {
             if ((map[getPosY() / cellSize][i] >= rangeBloqueBegin || map[(getPosY() + altoHitbox) / cellSize][i] >= rangeBloqueBegin) && 
                 (map[getPosY() / cellSize][i] <= rangeBloqueEspecialEnd || map[(getPosY() + altoHitbox) / cellSize][i] <= rangeBloqueEspecialEnd)) {
 
@@ -188,12 +156,11 @@ void Gato::controlarMovimientoVertical(const std::vector<std::vector<int>>& map)
         collideWithBlock(static_cast<int>(TECHO.x / cellSize), static_cast<int>(TECHO.y / cellSize) - 1.0f);
         nextMove = TECHO.y;
         velocidadY = 0;
-        //teclaSuelta = true;
+        
     }
 
     hitBox.move(0.f, nextMove - getPosY());
-    //std::cout << getPosY() + altoHitbox << " " << PISO.y << std::endl;
-
+    
     if (velocidadY > 0) {
         colisionPiso = true;
     }
@@ -209,7 +176,6 @@ void Gato::controlarMovimientoVertical(const std::vector<std::vector<int>>& map)
         morir();
     }
 
-    //std::cout << velocidadY << " " << << std::endl;
     if (velocidadY == 0 && !spacePressed) {
         colisionPiso = false;
     }
@@ -241,17 +207,16 @@ void Gato::controlarMovimientoHorizontal(float deltaTime, const std::vector<std:
     }
     
     if (proxMovimientoX != 0) {
-        //std::cout << OBJDER.x << " " << getPosX() + anchoHitbox + proxMovimientoX << std::endl;
-        if (getPosX() + anchoHitbox + proxMovimientoX > OBJDER.x) {
+       if (getPosX() + anchoHitbox + proxMovimientoX > OBJDER.x) {
 			//collideWithBlock(static_cast<int>(OBJDER.x / cellSize), static_cast<int>(OBJDER.y / cellSize));
 			proxMovimientoX = OBJDER.x - getPosX() - anchoHitbox - 1.0f;
-            //std::cout << "stop der " << std::endl;
+            
         }
        
         else if (getPosX() + proxMovimientoX < OBJIZQ.x) {
             //collideWithBlock(static_cast<int>(OBJIZQ.x / cellSize) - 1.0f, static_cast<int>(OBJIZQ.y / }cellSize));
             proxMovimientoX = OBJIZQ.x - getPosX() + 1.0f;
-            //std::cout << "stop izq" << std::endl;
+            
         }
 
         else {
@@ -418,7 +383,7 @@ void Gato::drawSprites(sf::RenderWindow& window) {
 void Gato::moverSprites() {
 
     if (left && !right) {
-        spriteGatoCaminar.setScale(-escalaX, escalaY); // Invertir el sprite en el eje X
+        spriteGatoCaminar.setScale(-escalaX, escalaY); 
         xTexture = (static_cast<int>(getPosX() / velocidadSprite) % numFigurasSprite) * static_cast<int>(anchoSprite);
         spriteGatoCaminar.setTextureRect(sf::IntRect(xTexture, 0, anchoSprite, altoSprite));
         spriteGatoCaminar.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2) + anchoSprite * escalaX, getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
@@ -427,7 +392,7 @@ void Gato::moverSprites() {
         mirandoIzq = true;
     }
     else if (right && !left) {
-        spriteGatoCaminar.setScale(escalaX, escalaY); // No invertir el sprite
+        spriteGatoCaminar.setScale(escalaX, escalaY); 
         xTexture = (numFigurasSprite - 1 - static_cast<int>(getPosX() / velocidadSprite) % numFigurasSprite) * static_cast<int>(anchoSpriteParado);
         spriteGatoCaminar.setTextureRect(sf::IntRect(xTexture, 0, anchoSpriteParado, altoSpriteParado));
         spriteGatoCaminar.setPosition(getPosX() - ((anchoSpriteParado * escalaX - anchoHitbox) / 2), getPosY() - ((altoSpriteParado * escalaY - altoHitbox) / 2));
@@ -441,14 +406,12 @@ void Gato::moverSprites() {
 
         if (mirandoIzq) {
             spriteGatoParado.setScale(-escalaX, escalaY);
-            //std::cout << xTexture << std::endl;
             xTexture = (static_cast<int>(countSpriteCambio / velocidadSpriteParado) % numFigurasSprite) * static_cast<int>(anchoSprite);
             spriteGatoParado.setTextureRect(sf::IntRect(xTexture, 0, anchoSprite, altoSprite));
             spriteGatoParado.setPosition(getPosX() - ((anchoSprite * escalaX - anchoHitbox) / 2) + anchoSprite * escalaX, getPosY() - ((altoSprite * escalaY - altoHitbox) / 2));
 
         }
         else {
-            //std::cout << xTexture << std::endl;
             spriteGatoParado.setScale(escalaX, escalaY);
             xTexture = (numFigurasSprite - 1 - static_cast<int>(countSpriteCambio / velocidadSpriteParado) % numFigurasSprite) * static_cast<int>(anchoSprite);
             spriteGatoParado.setTextureRect(sf::IntRect(xTexture, 0, anchoSprite, altoSprite));

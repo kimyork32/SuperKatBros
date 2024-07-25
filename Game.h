@@ -1,9 +1,12 @@
+// Game.h
 #include <SFML/Graphics.hpp>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <iostream>
-#include <memory> 
+#include <memory>
+#include <thread>
+#include <functional>
 
 #include "BackGround.h"
 #include "Gato.h"
@@ -31,9 +34,6 @@ public:
         enemigosManager->crearEnemigos(mapa);
         bloquesManager->crearBloques(mapa, gato);
         itemsManager->cargarPosicionesItemMap(mapa);
-        //window.setView(view);
-        //background = std::make_unique< BackGround>();
-        //mapa.printMap();
     }
 
     void run() {
@@ -48,20 +48,12 @@ private:
     sf::RenderWindow window;
     sf::View view;
     Colision colision;
-    //Mapa mapa;
     std::unique_ptr<Mapa> mapa;
-
-    // 
-    //std::unique_ptr<BackGround> background;
     std::unique_ptr<Gato> gato;
     std::unique_ptr<EnemigosManager> enemigosManager;
     std::unique_ptr<BloquesManager> bloquesManager;
     std::unique_ptr<ItemsManager> itemsManager;
-    //std::vector<std::shared_ptr<Item>> items;
-
-    // Coordenadas ventana flotante
     sf::Vector2f posWindowFloat;
-
     bool colisionLados = false;
     sf::Clock clock;
 
@@ -77,7 +69,7 @@ private:
     void determinarLimiteVentana() {
         posWindowFloat.x = gato->getPosX();
         posWindowFloat.y = gato->getPosY();
-        
+
         if (windowSizeAlto > numRows * cellSize) {
             posWindowFloat.y = numRows * cellSize - windowSizeAlto / 2;
         }
@@ -105,49 +97,31 @@ private:
             sf::sleep(sf::milliseconds(16 - elapsed.asMilliseconds()));
         }
         float deltaTime = clock.restart().asSeconds();
-        
-        // update gato
-        gato->update(deltaTime, mapa->getMap());
-        enemigosManager->update(deltaTime, mapa->getMap(), gato);
-        itemsManager->update(deltaTime, mapa->getMap());
 
-        // update fondo
-        //background->update(posWindowFloat.x, posWindowFloat.y);
-        //std::cout << posWindowFloat.x << " " << posWindowFloat.y << std::endl;
-        //background->update(posWindowFloat.x, posWindowFloat.y);
+        auto gatoUpdate = [this, deltaTime]() { gato->update(deltaTime, mapa->getMap()); };
+        auto enemigosUpdate = [this, deltaTime]() { enemigosManager->update(deltaTime, mapa->getMap(), *gato); };
+        auto itemsUpdate = [this, deltaTime]() { itemsManager->update(deltaTime, mapa->getMap()); };
 
-        //verificar colision gato-enemigos
+        std::thread threadGato(gatoUpdate);
+        std::thread threadEnemigosManager(enemigosUpdate);
+        std::thread threadItemsManager(itemsUpdate);
+
+        threadGato.join();
+        threadEnemigosManager.join();
+        threadItemsManager.join();
+
         colision.verificarColisionHitboxEnemigo(gato, enemigosManager->getVectorEnemigos());
-
         colision.verificarColisionBalaEnemigo(gato, enemigosManager->getVectorEnemigos());
-
-        //verificar colision gato-bloques
         bloquesManager->verificarColisionGatoBloque(gato, mapa, itemsManager);
-
-        //verificar colision gato-items
-        //colision.verificarColisionHitboxItem(gato.get(), itemsManager->getVectorItems());
         itemsManager->verificarColisionHitboxItem(gato);
 
-        //std::cout << "monedas: " << gato->getMonedas() << std::endl;
-        //std::cout << "vidas: " << gato->getVidas() << std::endl;
-        std::cout << "balas: " << gato->getBalas() << std::endl;
-
-        
-        //std::cout << "tam vect items: " << items.size() << std::endl;
-        
-        // Determinar coordenadas de la ventana
         determinarLimiteVentana();
-        
         view.setCenter(posWindowFloat);
-
         window.setView(view);
     }
 
     void render() {
         window.clear(sf::Color(0, 191, 255));
-        
-        // Dibujar fondo
-        //background->drawTo(window);
         mapa->draw(window);
         gato->drawTo(window);
         enemigosManager->draw(window);

@@ -8,14 +8,6 @@ BloqueMoneda::BloqueMoneda(float x, float y, unsigned int vidas) : Bloque(x, y) 
 
 }
 
-//void BloqueMoneda::disminuirVida() {
-//	this->vidas -= 1;
-//}
-//
-//unsigned int BloqueMoneda:: getVidas() {
-//	return this->vidas;
-//}
-
 bool BloqueMoneda::verificarItemDropeado() {
 	return itemDropeado;
 }

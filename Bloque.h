@@ -19,7 +19,6 @@ protected:
 	float altoHitbox = static_cast<float>(cellSize);
 	bool colisionDetect = false;
 	unsigned int vidas;
-	//std::string type;
 	
 public:
 
@@ -42,7 +41,6 @@ public:
 	void setColisionDetect(bool);
 	void disminuirVida(); 
 	unsigned int getVidas();
-	std::string getType();
 };
 
 #endif // !BLOQUE_H

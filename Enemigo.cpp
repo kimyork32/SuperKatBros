@@ -1,23 +1,39 @@
 #include "Enemigo.h"
 
-Enemigo::Enemigo(float x, float y) {
-    hitBox.setPosition(x, y);
-    hitBox.setSize(sf::Vector2f(anchoHitbox, altoHitbox));
-    hitBox.setFillColor(sf::Color::Red);
+Enemigo::Enemigo()
+    : hitBox(sf::Vector2f(0.f, 0.f)),
+    anchoHitbox(0.f),
+    altoHitbox(0.f),
+    excesoSprite(0.f),
+    anchoSprite(0.f),
+    altoSprite(0.f),
+    escalaX(0.f),
+    escalaY(0.f),
+    velocidadX(0.f),
+    velocidadSprite(0),
+    GRAVITY(0.f),
+    JUMP_FORCE(0.f),
+    MASS(0.f),
+    MAX_JUMP_TIME(0.f),
+    spriteMoverFilename("") 
+{
 
-    velocidadX = 170.0f;
-    velocidadY = 0.0f;
-
+    this->velocidadY = 0.0f;
     this->deteccionPiso = hitBox.getPosition();
-    left = false;
-    right = false;
-
-    spacePressed = false;
-    jumpButtonPressed = false;
-    teclaSuelta = false;
-
-    deltaTime = 0;
-    jumpTime = 0.0f;    
+    this->jumping = false;
+    this->left = false;
+    this->right = false;
+    this->rebote = false;
+    this->stop = false;
+    this->spacePressed = false;
+    this->jumpButtonPressed = false;
+    this->teclaSuelta = false;
+    this->jumpTime = 0.0f;
+    this->OBJDER = -1.0f;
+    this->OBJIZQ = -1.0f;
+    this->deltaTime = 0;
+    this->verificarMoverseMismaPlataforma = false;
+    this->yTexture = 0;
 }
 
 void Enemigo::applyGravity() {
@@ -208,6 +224,19 @@ float Enemigo::getAltoHitbox() {
 	return altoHitbox;
 }
 
+float Enemigo::getAnchoSprite() {
+    return anchoSprite;
+}
+
+float Enemigo::getAltoSprite() {
+    return altoSprite;
+}
+
+
+float Enemigo::getExcesoSprite() {
+    return excesoSprite;
+}
+
 float Enemigo::getPosX() {
     return hitBox.getPosition().x;
 }
@@ -216,6 +245,9 @@ float Enemigo::getPosY() {
     return hitBox.getPosition().y;
 }
 
+std::string Enemigo::getSpriteMoverFilename() {
+    return spriteMoverFilename;
+}
 
 void Enemigo::parar() {
     this->stop = true;
@@ -268,6 +300,7 @@ void Enemigo::detectarOjbIzqDerPlataforma(const std::vector<std::vector<int>> ma
 }
 
 void Enemigo::moverseMismaPlataforma(const std::vector<std::vector<int>> map) {
+    std::cout << "moviendose misma plataforma" << std::endl;
     detectarOjbIzqDerPlataforma(map, static_cast<int>(this->deteccionPiso.x/cellSize));
     detectarPiso(map, this->pisoUnicoPlataforma);
     this->verificarMoverseMismaPlataforma = true;
@@ -280,3 +313,21 @@ void Enemigo::detectarPisoRoto(const std::vector<std::vector<int>> map) {
         moverseMismaPlataforma(map);
     }
 }
+
+void Enemigo::setPosicion(float x, float y) { this->hitBox.setPosition(x, y); }
+void Enemigo::setAnchoHitbox(float anchoHitbox) { this->anchoHitbox = anchoHitbox; }
+void Enemigo::setAltoHitbox(float altoHitbox) { this->altoHitbox = altoHitbox; }
+void Enemigo::setTamanhoHitbox(float anchoHitbox, float altoHitbox) { this->hitBox.setSize(sf::Vector2f(anchoHitbox, altoHitbox)); };
+void Enemigo::setExcesoSprite(float excesoSprite) { this->excesoSprite = excesoSprite; }
+void Enemigo::setAnchoSprite(float anchoSprite) { this->anchoSprite = anchoSprite; }
+void Enemigo::setAltoSprite(float altoSprite) { this->altoSprite = altoSprite; }
+void Enemigo::setEscalaX(float escalaX) { this->escalaX = escalaX; }
+void Enemigo::setEscalaY(float escalaY) { this->escalaY = escalaY; }
+void Enemigo::setVelocidadX(float velocidadX) { this->velocidadX = velocidadX; }
+void Enemigo::setVelocidadSprite(int velocidadSprite) { this->velocidadSprite = velocidadSprite; }
+void Enemigo::setGravedad(float GRAVITY) { this->GRAVITY = GRAVITY; }
+void Enemigo::setFuerzaSalto(float JUMP_FORCE) { this->JUMP_FORCE = JUMP_FORCE; }
+void Enemigo::setMasa(float MASS) { this->MASS = MASS; }
+void Enemigo::setMaxTiempoSalto(float MAX_JUMP_TIME) { this->MAX_JUMP_TIME = MAX_JUMP_TIME; }
+void Enemigo::setSpriteMoverFilename(std::string spriteMoverFilename) { this->spriteMoverFilename = spriteMoverFilename; }
+

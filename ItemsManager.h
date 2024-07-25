@@ -14,7 +14,6 @@
 #include "ItemMoneda.h"
 #include "ItemAji.h"
 #include "ItemPollo.h"
-//#include "ItemPollo.h"
 
 class ItemsManager {
 private:

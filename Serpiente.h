@@ -7,13 +7,10 @@
 
 class Serpiente : public Enemigo {
 public:
-    Serpiente(float x, float y);
 
-    Serpiente(const Serpiente& other);
+    Serpiente();
 
     void update(float deltaTime, const std::vector<std::vector<int>>&) override;
-
-    std::unique_ptr<CloneableEnemigo> clone(int newX, int newY) const override;
 
 private:
     void saltar();

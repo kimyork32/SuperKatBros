@@ -88,9 +88,7 @@ public:
 		}
 	}
 	void moverSprites() {
-		//std::cout << posX << " " << posY << std::endl;
 		spriteFondoUlt.setTextureRect(sf::IntRect(posX - windowSizeAncho / 2, 0, anchoSpriteBackground, altoSpriteBackground));
-		//std::cout << "nueva posicion: " << posX << " " << posY << std::endl;
 		spriteFondoUlt.setPosition(posX - windowSizeAncho / 2, posY - windowSizeAlto / 2);
 	}
 };

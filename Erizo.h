@@ -9,13 +9,10 @@
 
 class Erizo : public Enemigo {
 public:
-    Erizo(float x, float y);
-
-    Erizo(Erizo& other);
+    Erizo();
+    
     
     void update(float deltaTime, const std::vector<std::vector<int>>&) override;
-
-    std::unique_ptr<CloneableEnemigo> clone(int newX, int newY) const override;
 
 private:
     void aumentarVelocidad();

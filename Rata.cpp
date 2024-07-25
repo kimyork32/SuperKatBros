@@ -1,11 +1,5 @@
 #include "Rata.h"
 
-Rata::Rata(float x, float y) : Enemigo(x, y) {
-    loadSpriteSheet("sprite.png");
-}
-
-Rata::Rata(const Rata& other) : Enemigo(other) {}
-
 
 void Rata::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     this->deltaTime = deltaTime;
@@ -24,6 +18,3 @@ void Rata::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     moverHorizontalSprite(left, right);
 }
 
-std::unique_ptr<CloneableEnemigo> Rata::clone(int newX, int newY) const {
-    return std::make_unique<Rata>(newX, newY);
-}

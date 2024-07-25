@@ -12,23 +12,20 @@ void Colision::verificarColisionHitboxEnemigo(std::unique_ptr<Gato>& gato, std::
                 enemigos[i]->colisionLados = false;
             }
 
-            // Colision por los lados
             if (enemigos[i]->getPosY() < gato->getPosY() + gato->getAltoHitbox() + 1.0f &&
                 enemigos[i]->getPosY() + enemigos[i]->getAltoHitbox() + 1.0f > gato->getPosY()) {
                 enemigos[i]->colisionLados = true;
             }
 
-            // Incrementar i solo si no se elimina el elemento en este ciclo
             ++i;
         }
         else {
-            if (enemigos[i]->colisionLados) { // player colisiona en los lados del enemigo -> player muere
+            if (enemigos[i]->colisionLados) { 
                 gato->morir();
             }
-            else { // player colisiona por arriba del enemigo -> enemigo muere
+            else { 
                 enemigos.erase(enemigos.begin() + i);
             }
-            // No incrementar i aquí, ya que se ajusta automáticamente al borrar elementos del vector
         }
     }
 }

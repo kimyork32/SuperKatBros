@@ -18,9 +18,7 @@ private:
     sf::Clock relojMovimientoDireccion;
 
 public:
-    PezGlobo(float, float);
-
-    PezGlobo(const PezGlobo& other);
+    PezGlobo();
 
     ~PezGlobo();
 
@@ -28,7 +26,7 @@ public:
 
     void disparar();
 
-    void verificarColisionBalaGato(std::unique_ptr<Gato>&);
+    void verificarColisionBalaGato(Gato&);
 
     void verificarColisionBalaBloque();
     
@@ -36,7 +34,7 @@ public:
 
     void drawTo(sf::RenderWindow& window) override;
 
-    std::unique_ptr<CloneableEnemigo> clone(int newX, int newY) const override;
+    //std::unique_ptr<CloneableEnemigo> clone(int newX, int newY) const override;
 
 };
 

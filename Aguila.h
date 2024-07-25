@@ -16,15 +16,14 @@ private:
     int maxRecorridoDer;
 
     float yCentro;
-    float amplitud = 30; // Amplitud de la oscilación
-    float frecuencia = 0.4; // Frecuencia en oscilaciones por segundo, asegurarse que no sea 0
+    float amplitud = 30; 
+    float frecuencia = 0.4; 
     float fase = 0;
     sf::Clock relojOscilacion;
 
 public:
-    Aguila(float, float);
+    Aguila();
 
-    Aguila(const Aguila& other);
 
     ~Aguila() {};
 
@@ -34,7 +33,11 @@ public:
 
     void determinarVuelo();
 
-    std::unique_ptr<CloneableEnemigo> clone(int newX, int newY) const override;
+    void setYCentro(float);
+
+    void setMaxRecorridoDer(float);
+
+    void setMaxRecorridoIzq(float);
 };
 
 #endif // AGUILA_H

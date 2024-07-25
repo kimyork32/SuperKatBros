@@ -1,23 +1,7 @@
 #include "Aguila.h"
 
-Aguila::Aguila(float x, float y) : Enemigo(x, y) {
-    this->maxRecorridoDer = getPosX() + (6 * cellSize);
-    this->maxRecorridoIzq = getPosX() - ((6 + 1) * cellSize);
-    //this->PISO = y + cellSize;
-    this->yCentro = y + altoHitbox / 2;
-    loadSpriteSheet("sprite.png");
-}
+Aguila::Aguila() : Enemigo(), maxRecorridoDer(0.f), maxRecorridoIzq(0.f), yCentro(0.f) {}
 
-Aguila::Aguila(const Aguila& other) :
-    Enemigo(other),
-    verificarMoverseMismaPlataforma(other.verificarMoverseMismaPlataforma),
-    maxRecorridoIzq(other.maxRecorridoIzq),
-    maxRecorridoDer(other.maxRecorridoDer),
-    yCentro(other.yCentro),
-    amplitud(other.amplitud),
-    frecuencia(other.frecuencia),
-    fase(other.fase),
-    relojOscilacion(other.relojOscilacion) {}
 
 void Aguila::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     this->deltaTime = deltaTime;
@@ -49,9 +33,15 @@ void Aguila::determinarVuelo() {
 
 
     hitBox.move(0, nuevaY - getPosY());
-    
+
 }
 
-std::unique_ptr<CloneableEnemigo> Aguila::clone(int newX, int newY) const {
-    return std::make_unique<Aguila>(newX, newY);
+void Aguila::setYCentro(float yCentro) {
+    this->yCentro = yCentro;
+}
+void Aguila::setMaxRecorridoDer(float maxRecorridoDer) {
+    this->maxRecorridoDer = maxRecorridoDer;
+}
+void Aguila::setMaxRecorridoIzq(float maxRecorridoIzq) {
+    this->maxRecorridoIzq = maxRecorridoIzq;
 }

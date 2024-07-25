@@ -12,24 +12,13 @@ Item::Item(float x, float y) {
     
     velocidadX = 170.0f;
     velocidadY = 0.0f;
-
-    //left = false;
-    //right = false;
-
-    //spacePressed = false;
-    //jumpButtonPressed = false;
-    //teclaSuelta = false;
-
     deltaTime = 0;
-    //jumpTime = 0.0f;
     //loadSpriteSheet("sprite.png");
 
     this->rebote = std::rand() % 2;
 }
 
-Item::~Item() {
-    //std::cout << "Item muerto" << std::endl;
-}
+Item::~Item() {}
 
 
 void Item::applyGravity() {
@@ -101,7 +90,7 @@ void Item::controlarMovimientoVertical(const std::vector<std::vector<int>>& map)
     if (nextMove < TECHO) {
         nextMove = TECHO;
         velocidadY = 0;
-        //teclaSuelta = true;
+        
     }
 
     hitBox.move(0.f, nextMove - hitBox.getPosition().y);
@@ -150,41 +139,7 @@ void Item::drawTo(sf::RenderWindow& window) {
     window.draw(hitBox);
     //window.draw(spriteItem);
 }
-//
-//sf::Vector2f Item::getPosition() const {
-//    return hitBox.getPosition();
-//}
-//
-//void Item::loadSpriteSheet(const std::string& filename) {
-//    if (!texturaItem.loadFromFile(filename)) {
-//        std::cerr << "Error cargando la textura" << std::endl;
-//        return;
-//    }
-//    spriteItem.setTexture(texturaItem);
-//    spriteItem.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
-//    spriteItem.setScale(escalaX, escalaY);
-//}
-//
-//void Item::moverHorizontalSprite(bool left, bool right) {
-//    if (!stop) {
-//        if (rebote) {
-//            yTexture = (int(spriteItem.getPosition().x) / velocidadSprite) % 3 * altoSprite;
-//            spriteItem.setTextureRect(sf::IntRect(anchoSprite, yTexture, anchoSprite, altoSprite));
-//        }
-//        if (!rebote) {
-//            yTexture = (int(spriteItem.getPosition().x) / velocidadSprite) % 3 * altoSprite;
-//            spriteItem.setTextureRect(sf::IntRect(anchoSprite * 3, yTexture, anchoSprite, altoSprite));
-//        }
-//    }
-//    else {
-//        spriteItem.setTextureRect(sf::IntRect(0, 0, anchoSprite, altoSprite));
-//    }
-//
-//    spriteItem.setPosition(hitBox.getPosition().x - ((anchoSprite * escalaX - anchoHitbox) / 2), hitBox.getPosition().y - ((altoSprite * escalaY - altoHitbox) / 2));
-//
-//}
-//
-//
+
 void Item::update(float deltaTime, const std::vector<std::vector<int>>& map) {
     this->deltaTime = deltaTime;
 
@@ -204,30 +159,5 @@ void Item::update(float deltaTime, const std::vector<std::vector<int>>& map) {
 sf::RectangleShape Item::getHitBox() {
     return hitBox;
 }
-//
-//float Item::getAnchoHitbox() {
-//    return anchoHitbox;
-//}
-//
-//float Item::getAltoHitbox() {
-//    return altoHitbox;
-//}
-//
-//float Item::getPosX() {
-//    return hitBox.getPosition().x;
-//}
-//
-//float Item::getPosY() {
-//    return hitBox.getPosition().y;
-//}
-//
-////void Item::setVelocidadX(float velocidadX) {
-////    this->velocidadX = velocidadX;
-////}
-//
-//void Item::parar() {
-//    this->stop = true;
-//}
-//
-//
+
 

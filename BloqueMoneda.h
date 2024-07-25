@@ -16,9 +16,6 @@ public:
 	bool verificarItemDropeado();
 
 	void setItemDropeado(bool);
-	//void disminuirVida();
-
-	//unsigned int getVidas();
 };
 
 
