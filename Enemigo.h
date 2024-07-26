@@ -3,7 +3,6 @@
 
 #include <SFML/Graphics.hpp>
 #include "Definitions.hpp"
-#include "CloneableEnemigo.h"
 
 #include <iostream>
 #include <vector>
