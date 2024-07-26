@@ -1,4 +1,5 @@
-#include "Game.h"
+#include <SFML/Graphics.hpp>
+#include "Menu.h"
 
 int main() {
     
@@ -7,7 +8,9 @@ int main() {
     std::cout << valEnemigoSerpiente << std::endl;
     std::cout << valEnemigoPezGlobo << std::endl;
     std::cout << valEnemigoAguila << std::endl;
-    Game game;
-    game.run();
+    sf::RenderWindow window(sf::VideoMode(800, 600), "SuperKat");
+
+    Menu menu(window);
+    menu.run();
     return 0;
 }
